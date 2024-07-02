@@ -4,7 +4,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
-class DbHelper(private val context: Context):
+class DbHelper(context: Context):
     SQLiteOpenHelper(
         context,
         DatabaseConstants.DATABASE_NAME,
@@ -44,6 +44,18 @@ class DbHelper(private val context: Context):
     override fun onConfigure(db: SQLiteDatabase?) {
         super.onConfigure(db)
         db?.setForeignKeyConstraintsEnabled(true)
+    }
+
+    fun checkUserExistence(name: String, password: String): Int {
+        val sql =
+            "SELECT id FROM users WHERE name=? and password=?"
+        val db = this.readableDatabase
+        db.rawQuery(sql, arrayOf(name, password)).use {
+            if (it.moveToFirst()) {
+                return it.getInt(0)
+            }
+        }
+        return -1
     }
 
 }
