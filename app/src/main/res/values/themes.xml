@@ -1,9 +1,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.DeltaAProject" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/lightPrimary</item>
-        <item name="colorSecondary">@color/lightSecondary</item>
-        <item name="colorAccent">@color/lightAccent</item>
+        <item name="colorPrimary">@color/lightPurple</item>
+        <item name="colorSecondary">@color/blue</item>
+        <item name="colorAccent">@color/cream</item>
     </style>
 
     <style name="Theme.DeltaAProject" parent="Base.Theme.DeltaAProject" />

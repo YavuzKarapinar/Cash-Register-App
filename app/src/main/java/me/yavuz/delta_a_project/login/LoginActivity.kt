@@ -1,7 +1,6 @@
-package me.yavuz.delta_a_project
+package me.yavuz.delta_a_project.login
 
 import android.content.Intent
-import android.database.Cursor
 import android.os.Bundle
 import android.text.TextUtils
 import android.widget.Toast
@@ -9,6 +8,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import me.yavuz.delta_a_project.main.MainActivity
+import me.yavuz.delta_a_project.R
+import me.yavuz.delta_a_project.database.DbHelper
 import me.yavuz.delta_a_project.databinding.ActivityLoginBinding
 
 class LoginActivity : AppCompatActivity() {

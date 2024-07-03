@@ -1,4 +1,4 @@
-package me.yavuz.delta_a_project
+package me.yavuz.delta_a_project.database
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
