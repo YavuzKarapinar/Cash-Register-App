@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/lightPurple"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".main.MainFragment">
+
+    <GridLayout
+        android:id="@+id/gridLayout"
+        android:layout_width="400dp"
+        android:layout_height="350dp"
+        android:layout_marginStart="250dp"
+        android:background="@drawable/borders"
+        android:columnCount="4"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:rowCount="4"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0">
+
+        <Button
+            android:id="@+id/button_7"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:backgroundTint="@color/numberBackground"
+            android:text="7"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/button_8"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:backgroundTint="@color/numberBackground"
+            android:text="8"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/button_9"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:backgroundTint="@color/numberBackground"
+            android:text="9"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/button_plu"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:backgroundTint="@color/pluBackground"
+            android:text="PLU"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/button_4"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:backgroundTint="@color/numberBackground"
+            android:text="4"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/button_5"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:backgroundTint="@color/numberBackground"
+            android:text="5"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/button_6"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:backgroundTint="@color/numberBackground"
+            android:text="6"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/button_disc"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:backgroundTint="@color/discBackground"
+            android:text="DISC"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/button_1"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:backgroundTint="@color/numberBackground"
+            android:text="1"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/button_2"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:backgroundTint="@color/numberBackground"
+            android:text="2"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/button_3"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:backgroundTint="@color/numberBackground"
+            android:text="3"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/button_times"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:backgroundTint="@color/numberBackground"
+            android:text="x/%"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/button_0"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:backgroundTint="@color/numberBackground"
+            android:text="0"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/button_00"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:backgroundTint="@color/numberBackground"
+            android:text="00"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/button_dot"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:backgroundTint="@color/numberBackground"
+            android:text="."
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/button_c"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:backgroundTint="@color/clearBackground"
+            android:text="C"
+            android:textSize="18sp" />
+
+    </GridLayout>
+
+    <TextView
+        android:id="@+id/showNumbers"
+        android:layout_width="400dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="250dp"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/borders"
+        android:paddingEnd="20dp"
+        android:text="0.00"
+        android:textAlignment="textEnd"
+        android:textSize="32sp"
+        app:layout_constraintBottom_toTopOf="@+id/gridLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/cartRecyclerView"
+        android:layout_width="400dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="250dp"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/borders"
+        android:nestedScrollingEnabled="true"
+        app:layout_constraintBottom_toTopOf="@+id/showNumbers"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/itemRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/borders"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/gridLayout"
+        app:layout_constraintTop_toBottomOf="@+id/mainItemSearch" />
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        app:cardBackgroundColor="@color/lightPurple"
+        app:layout_constraintEnd_toStartOf="@+id/gridLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="16dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/borders">
+
+            <TextView
+                android:id="@+id/mainTotalPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="175dp"
+                android:text="Total: 0.00"
+                android:textSize="32sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <Button
+                android:id="@+id/paymentButton"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="150dp"
+                android:text="Payment"
+                android:textSize="24sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.496"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/mainTotalPrice"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <Button
+                android:id="@+id/returnButton"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
+                android:text="Return"
+                android:textSize="24sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.496"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/paymentButton"
+                app:layout_constraintVertical_bias="0.0" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
+    <SearchView
+        android:id="@+id/mainItemSearch"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:iconifiedByDefault="false"
+        android:background="@drawable/borders"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/cartRecyclerView"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

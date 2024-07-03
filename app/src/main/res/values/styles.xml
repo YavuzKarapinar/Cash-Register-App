@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="BottomNavigationViewStyle" >
+        <item name="itemIconSize">24dp</item>
+        <item name="itemTextAppearanceActive">@style/BottomNavigationActiveText</item>
+        <item name="itemTextAppearanceInactive">@style/BottomNavigationInactiveText</item>
+    </style>
+
+    <style name="BottomNavigationActiveText" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/lightPurple</item>
+        <item name="itemIconTint">@color/lightPurple</item>
+    </style>
+
+    <style name="BottomNavigationInactiveText" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="itemIconTint">@color/black</item>
+    </style>
+
+</resources>
