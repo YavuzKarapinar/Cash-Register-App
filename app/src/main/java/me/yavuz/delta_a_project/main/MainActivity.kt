@@ -32,29 +32,4 @@ class MainActivity : AppCompatActivity() {
         dbHelper.close()
     }
 
-    /*
-    navHostFragment =
-            childFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        navController = navHostFragment.navController
-        binding.bottomNavigation.setupWithNavController(navController)
-        homeParentViewModel= ViewModelProvider(this)[HomeParentViewModel::class.java]
-        navController.addOnDestinationChangedListener { controller, destination, arguments ->
-            if (controller.currentDestination?.id == R.id.home2) {
-                binding.homeParentIconsLinear.visibility = View.VISIBLE
-                MainActivity.viewPagerEnable.value = true
-            } else {
-                binding.homeParentIconsLinear.visibility = View.GONE
-                MainActivity.viewPagerEnable.value = false
-            }
-        }
-
-        private fun replaceFragment(fragment: Fragment) {
-
-        val fragmentManager = supportFragmentManager
-        val replaceTransaction = fragmentManager.beginTransaction()
-        replaceTransaction.replace(R.id.mainFrame, fragment)
-        replaceTransaction.commit()
-    }
-        */
-
 }

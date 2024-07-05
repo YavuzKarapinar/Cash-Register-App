@@ -1,10 +1,11 @@
 package me.yavuz.delta_a_project.settings
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import me.yavuz.delta_a_project.R
 import me.yavuz.delta_a_project.adapter.SettingsExpandableListAdapter
 import me.yavuz.delta_a_project.databinding.FragmentSettingsBinding
 
@@ -17,16 +18,43 @@ class SettingsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentSettingsBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         val group = listOf("STAFF", "MASTER DATA")
         val staffChild = listOf("USER ADD", "USER LIST")
-        val masterDataChild = listOf("ADD GROUP", "ADD DEPARTMENT", "ADD TAX", "ADD PRODUCT")
+        val masterDataChild = listOf(
+            "ADD GROUP",
+            "ADD DEPARTMENT",
+            "ADD TAX",
+            "ADD PRODUCT"
+        )
         val childMap = hashMapOf(group[0] to staffChild, group[1] to masterDataChild)
 
         val adapter = SettingsExpandableListAdapter(binding.root.context, group, childMap)
         binding.expandableListView.setAdapter(adapter)
-
-        return binding.root
+        onChildClick(childMap, group)
     }
 
+    private fun onChildClick(childMap: HashMap<String, List<String>>, group: List<String>) {
+        binding.expandableListView.setOnChildClickListener { _, _, groupPosition, childPosition, _ ->
+            val selectedFragment = when (childMap[group[groupPosition]]?.get(childPosition)) {
+                "USER ADD" -> SettingsUserAddFragment()
+                "USER LIST" -> SettingsUserListFragment()
+                "ADD GROUP" -> SettingsGroupAddFragment()
+                "ADD DEPARTMENT" -> SettingsDepartmentAddFragment()
+                "ADD TAX" -> SettingsTaxAddFragment()
+                "ADD PRODUCT" -> SettingsProductAddFragment()
+                else -> Fragment()
+            }
+
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.settingsFragmentContainer, selectedFragment)
+                .commit()
+
+            false
+        }
+    }
 }
