@@ -199,4 +199,15 @@ class DbHelper private constructor(context: Context) :
 
         return null
     }
+
+    fun saveTax(name: String, value: Double) {
+        val db = this.writableDatabase
+
+        val values = ContentValues().apply {
+            put("name", name)
+            put("value", value)
+        }
+
+        db.insert("taxes", null, values)
+    }
 }
