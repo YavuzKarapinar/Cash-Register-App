@@ -4,8 +4,11 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
 import me.yavuz.delta_a_project.model.Department
 import me.yavuz.delta_a_project.model.Group
+import me.yavuz.delta_a_project.model.Product
+import me.yavuz.delta_a_project.model.Tax
 import me.yavuz.delta_a_project.model.User
 import me.yavuz.delta_a_project.model.UserType
 
@@ -200,6 +203,19 @@ class DbHelper private constructor(context: Context) :
         return null
     }
 
+    fun getDepartments(): List<Department> {
+        val departments = mutableListOf<Department>()
+        val db = this.readableDatabase
+        val sql = "SELECT id, group_id, name FROM `department`"
+        db.rawQuery(sql, null).use {
+            while (it.moveToNext()) {
+                departments.add(Department(it.getInt(0), it.getInt(1), it.getString(2)))
+            }
+        }
+
+        return departments
+    }
+
     fun saveTax(name: String, value: Double) {
         val db = this.writableDatabase
 
@@ -209,5 +225,46 @@ class DbHelper private constructor(context: Context) :
         }
 
         db.insert("taxes", null, values)
+    }
+
+    fun getTaxByName(name: String): Tax? {
+        val db = this.readableDatabase
+        val sql = "SELECT id, name, value FROM taxes WHERE name = ?"
+
+        db.rawQuery(sql, arrayOf(name)).use {
+            if (it.moveToFirst()) {
+                return Tax(it.getInt(0), it.getString(1), it.getDouble(2))
+            }
+        }
+
+        return null
+    }
+
+    fun getTaxes(): List<Tax> {
+        val taxes = mutableListOf<Tax>()
+        val db = this.readableDatabase
+        val sql = "SELECT id, name, value FROM taxes"
+        db.rawQuery(sql, null).use {
+            while (it.moveToNext()) {
+                taxes.add(Tax(it.getInt(0), it.getString(1), it.getDouble(2)))
+            }
+        }
+
+        return taxes
+    }
+
+    fun saveProduct(product: Product) {
+        val db = this.writableDatabase
+        val values = ContentValues().apply {
+            put("name", product.name)
+            put("gross_price", product.price)
+            put("stock", product.stock)
+            put("tax_id", product.taxId)
+            put("department_id", product.departmentId)
+            put("product_number", product.productNumber)
+        }
+
+        val l = db.insert("products", null, values)
+        Log.d("TAG", l.toString())
     }
 }

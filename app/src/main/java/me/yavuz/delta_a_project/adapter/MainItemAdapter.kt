@@ -19,7 +19,7 @@ class MainItemAdapter : ListAdapter<Product, MainItemAdapter.MainItemViewHolder>
         RecyclerView.ViewHolder(binding.root) {
         fun bind(product: Product) {
             binding.itemName.text = product.name
-            binding.itemQuantity.text = product.quantity.toString()
+            binding.itemQuantity.text = product.stock.toString()
             binding.itemPrice.text = product.price.toString()
         }
 
@@ -78,7 +78,7 @@ class MainItemAdapter : ListAdapter<Product, MainItemAdapter.MainItemViewHolder>
             override fun areContentsTheSame(oldItem: Product, newItem: Product): Boolean {
                 return oldItem.name == newItem.name &&
                         oldItem.price == newItem.price &&
-                        oldItem.quantity == newItem.quantity
+                        oldItem.stock == newItem.stock
             }
         }
     }

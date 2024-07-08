@@ -33,9 +33,9 @@ class MainFragment : Fragment() {
     private fun declaringViews() {
         decimalFormat = DecimalFormat("#,###.##")
         // test items
-        val product1 = Product(1, "test", 1.0, 1, 1.0, 1, 1)
-        val product2 = Product(1, "far", 1.0, 1, 1.0, 1, 1)
-        val product3 = Product(1, "bar", 1.0, 1, 1.0, 1, 1)
+        val product1 = Product(1, "test", 1.0, 1, 1, 1, 1)
+        val product2 = Product(1, "far", 1.0, 1, 1, 1, 1)
+        val product3 = Product(1, "bar", 1.0, 1, 1, 1, 1)
         val itemList = arrayListOf(product1, product2, product3)
 
         binding.itemRecyclerView.apply {
