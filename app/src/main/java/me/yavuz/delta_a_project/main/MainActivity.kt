@@ -22,14 +22,13 @@ class MainActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
 
-        dbHelper = DbHelper(this)
+        dbHelper = DbHelper.getInstance(this)
 
         navHostFragment =
             supportFragmentManager.findFragmentById(R.id.mainFrame) as NavHostFragment
         navController = navHostFragment.navController
         binding.bottomNavigationView.setupWithNavController(navController)
 
-        dbHelper.close()
     }
 
 }

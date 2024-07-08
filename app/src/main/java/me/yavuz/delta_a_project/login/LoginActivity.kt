@@ -30,13 +30,12 @@ class LoginActivity : AppCompatActivity() {
             insets
         }
 
-        dbHelper = DbHelper(this)
+        dbHelper = DbHelper.getInstance(this)
 
         binding.loginButton.setOnClickListener {
             retrieveUserData()
         }
 
-        dbHelper.close()
     }
 
     private fun retrieveUserData() {
