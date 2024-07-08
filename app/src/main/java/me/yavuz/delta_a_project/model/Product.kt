@@ -4,8 +4,8 @@ data class Product(
     val id: Int,
     val name: String,
     val price: Double,
-    val quantity: Int,
-    val tax: Double,
+    val stock: Int,
     val productNumber: Int,
+    val taxId: Int,
     val departmentId: Int
 )

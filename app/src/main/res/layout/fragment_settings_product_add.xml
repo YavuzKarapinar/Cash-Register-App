@@ -1,14 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".settings.SettingsProductAddFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Product" />
+        android:orientation="vertical">
 
-</FrameLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="65dp"
+                android:text="PRODUCT"
+                android:textSize="40sp" />
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="65dp"
+                android:background="@drawable/borders">
+
+                <Spinner
+                    android:id="@+id/productDepartmentSpinner"
+                    style="@style/Widget.AppCompat.DropDownItem.Spinner"
+                    android:layout_width="400dp"
+                    android:layout_height="48dp" />
+            </RelativeLayout>
+
+            <EditText
+                android:id="@+id/productName"
+                android:layout_width="400dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="65dp"
+                android:autofillHints=""
+                android:background="@drawable/borders"
+                android:hint="Product Name"
+                android:inputType="text" />
+
+            <EditText
+                android:id="@+id/productNumber"
+                android:layout_width="400dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="65dp"
+                android:autofillHints=""
+                android:background="@drawable/borders"
+                android:hint="Product Number"
+                android:inputType="number" />
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="65dp"
+                android:background="@drawable/borders">
+
+                <Spinner
+                    android:id="@+id/productTaxSpinner"
+                    style="@style/Widget.AppCompat.DropDownItem.Spinner"
+                    android:layout_width="400dp"
+                    android:layout_height="48dp" />
+            </RelativeLayout>
+
+            <EditText
+                android:id="@+id/grossPrice"
+                android:layout_width="400dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="65dp"
+                android:autofillHints=""
+                android:background="@drawable/borders"
+                android:hint="Price (Gross)"
+                android:inputType="numberDecimal" />
+
+            <EditText
+                android:id="@+id/productStock"
+                android:layout_width="400dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="65dp"
+                android:autofillHints=""
+                android:background="@drawable/borders"
+                android:hint="Stock"
+                android:inputType="number" />
+
+            <Button
+                android:id="@+id/productSave"
+                android:layout_width="400dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="65dp"
+                android:text="Save"
+                android:textSize="24sp" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,60 +1,100 @@
 package me.yavuz.delta_a_project.settings
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.Toast
+import androidx.fragment.app.Fragment
 import me.yavuz.delta_a_project.R
+import me.yavuz.delta_a_project.database.DbHelper
+import me.yavuz.delta_a_project.databinding.FragmentSettingsProductAddBinding
+import me.yavuz.delta_a_project.model.Product
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [SettingsProductAddFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class SettingsProductAddFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private lateinit var binding: FragmentSettingsProductAddBinding
+    private lateinit var dbHelper: DbHelper
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_settings_product_add, container, false)
+    ): View {
+        binding = FragmentSettingsProductAddBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment SettingsProductAddFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            SettingsProductAddFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        dbHelper = DbHelper.getInstance(binding.root.context)
+
+        spinnerInitialize()
+        binding.productSave.setOnClickListener {
+            saveOnClick()
+        }
+    }
+
+    private fun spinnerInitialize() {
+        val departmentList = dbHelper.getDepartments().map { it.name }
+        binding.productDepartmentSpinner.apply {
+            adapter = ArrayAdapter(
+                binding.root.context,
+                R.layout.spinner_item,
+                departmentList
+            )
+        }
+
+        val taxList = dbHelper.getTaxes().map { it.name }
+        binding.productTaxSpinner.apply {
+            adapter = ArrayAdapter(
+                binding.root.context,
+                R.layout.spinner_item,
+                taxList
+            )
+        }
+    }
+
+    private fun saveOnClick() {
+        val name = binding.productName.text.toString()
+        val price = binding.grossPrice.text.toString().toDouble()
+        val stock = binding.productStock.text.toString().toInt()
+        val department = binding.productDepartmentSpinner.selectedItem.toString()
+        val tax = binding.productTaxSpinner.selectedItem.toString()
+        val productNumber = binding.productNumber.text.toString().toInt()
+
+        val product = Product(
+            0,
+            name,
+            price,
+            stock,
+            productNumber,
+            dbHelper.getTaxByName(tax)?.id ?: 0,
+            dbHelper.getDepartmentByName(department)?.id ?: 0
+        )
+
+        if (TextUtils.isEmpty(name) ||
+            TextUtils.isEmpty(price.toString()) ||
+            TextUtils.isEmpty(stock.toString()) ||
+            TextUtils.isEmpty(productNumber.toString()) ||
+            TextUtils.isEmpty(department) ||
+            TextUtils.isEmpty(tax) ||
+            TextUtils.isEmpty(product.toString())
+        ) {
+            Toast.makeText(
+                binding.root.context,
+                "Please fill all fields!",
+                Toast.LENGTH_SHORT
+            ).show()
+        } else {
+            Toast.makeText(
+                binding.root.context,
+                "Product saved!",
+                Toast.LENGTH_SHORT
+            ).show()
+            dbHelper.saveProduct(product)
+        }
+
     }
 }

@@ -5,6 +5,10 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
+import me.yavuz.delta_a_project.model.Department
+import me.yavuz.delta_a_project.model.Group
+import me.yavuz.delta_a_project.model.Product
+import me.yavuz.delta_a_project.model.Tax
 import me.yavuz.delta_a_project.model.User
 import me.yavuz.delta_a_project.model.UserType
 
@@ -88,7 +92,6 @@ class DbHelper private constructor(context: Context) :
         val db = this.readableDatabase
         val sql = "SELECT id FROM user_type WHERE name = ?"
         db.rawQuery(sql, arrayOf(userType)).use {
-            Log.d("TAG", "saveUser: $it")
             if (it.moveToFirst()) {
                 val userTypeId = it.getInt(0)
                 val values = ContentValues().apply {
@@ -96,12 +99,7 @@ class DbHelper private constructor(context: Context) :
                     put("name", name)
                     put("password", password)
                 }
-                val newRowId = db.insert("users", null, values)
-                if (newRowId == -1L) {
-                    Log.e("TAG", "Error inserting user: $values")
-                } else {
-                    Log.d("TAG", "User inserted with ID: $newRowId")
-                }
+                db.insert("users", null, values)
             }
         }
     }
@@ -127,5 +125,146 @@ class DbHelper private constructor(context: Context) :
             }
         }
         return users
+    }
+
+    fun saveGroup(groupName: String) {
+        val db = this.readableDatabase
+        val values = ContentValues().apply {
+            put("name", groupName)
+        }
+
+        db.insert("`group`", null, values)
+    }
+
+    fun getGroups(): List<Group> {
+        val groups = mutableListOf<Group>()
+        val sql =
+            "SELECT id, name FROM `group`"
+
+        val db = this.readableDatabase
+
+        db.rawQuery(sql, null).use {
+            while (it.moveToNext()) {
+                val id = it.getInt(it.getColumnIndexOrThrow("id"))
+                val name = it.getString(it.getColumnIndexOrThrow("name"))
+                groups.add(Group(id, name))
+            }
+        }
+
+        return groups
+    }
+
+    fun getGroupById(id: Int): Group? {
+        val db = this.readableDatabase
+        val sql = "SELECT id, name FROM `group` WHERE id = ?"
+
+        db.rawQuery(sql, arrayOf(id.toString())).use {
+            if (it.moveToFirst()) {
+                return Group(it.getInt(0), it.getString(1))
+            }
+        }
+
+        return null
+    }
+
+    fun getGroupByName(name: String): Group? {
+        val db = this.readableDatabase
+        val sql = "SELECT id, name FROM `group` WHERE name = ?"
+
+        db.rawQuery(sql, arrayOf(name)).use {
+            if (it.moveToFirst()) {
+                return Group(it.getInt(0), it.getString(1))
+            }
+        }
+
+        return null
+    }
+
+    fun saveDepartment(group: String, name: String) {
+        val db = this.writableDatabase
+        val values = ContentValues().apply {
+            put("group_id", getGroupByName(group)?.id)
+            put("name", name)
+        }
+
+        db.insert("department", null, values)
+    }
+
+    fun getDepartmentByName(name: String): Department? {
+        val db = this.readableDatabase
+        val sql = "SELECT id, group_id, name FROM `department` WHERE name = ?"
+
+        db.rawQuery(sql, arrayOf(name)).use {
+            if (it.moveToFirst()) {
+                return Department(it.getInt(0), it.getInt(1), it.getString(2))
+            }
+        }
+
+        return null
+    }
+
+    fun getDepartments(): List<Department> {
+        val departments = mutableListOf<Department>()
+        val db = this.readableDatabase
+        val sql = "SELECT id, group_id, name FROM `department`"
+        db.rawQuery(sql, null).use {
+            while (it.moveToNext()) {
+                departments.add(Department(it.getInt(0), it.getInt(1), it.getString(2)))
+            }
+        }
+
+        return departments
+    }
+
+    fun saveTax(name: String, value: Double) {
+        val db = this.writableDatabase
+
+        val values = ContentValues().apply {
+            put("name", name)
+            put("value", value)
+        }
+
+        db.insert("taxes", null, values)
+    }
+
+    fun getTaxByName(name: String): Tax? {
+        val db = this.readableDatabase
+        val sql = "SELECT id, name, value FROM taxes WHERE name = ?"
+
+        db.rawQuery(sql, arrayOf(name)).use {
+            if (it.moveToFirst()) {
+                return Tax(it.getInt(0), it.getString(1), it.getDouble(2))
+            }
+        }
+
+        return null
+    }
+
+    fun getTaxes(): List<Tax> {
+        val taxes = mutableListOf<Tax>()
+        val db = this.readableDatabase
+        val sql = "SELECT id, name, value FROM taxes"
+        db.rawQuery(sql, null).use {
+            while (it.moveToNext()) {
+                taxes.add(Tax(it.getInt(0), it.getString(1), it.getDouble(2)))
+            }
+        }
+
+        return taxes
+    }
+
+    fun saveProduct(product: Product) {
+        val db = this.writableDatabase
+        val values = ContentValues().apply {
+            put("name", product.name)
+            put("gross_price", product.price)
+            put("stock", product.stock)
+            put("tax_id", product.taxId)
+            put("department_id", product.departmentId)
+            put("product_number", product.productNumber)
+        }
+
+        val l = db.insert("products", null, values)
+        Log.d("TAG", l.toString())
     }
 }
