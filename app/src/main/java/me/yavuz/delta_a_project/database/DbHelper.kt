@@ -4,7 +4,6 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import android.util.Log
 import me.yavuz.delta_a_project.model.User
 import me.yavuz.delta_a_project.model.UserType
 
@@ -88,7 +87,6 @@ class DbHelper private constructor(context: Context) :
         val db = this.readableDatabase
         val sql = "SELECT id FROM user_type WHERE name = ?"
         db.rawQuery(sql, arrayOf(userType)).use {
-            Log.d("TAG", "saveUser: $it")
             if (it.moveToFirst()) {
                 val userTypeId = it.getInt(0)
                 val values = ContentValues().apply {
@@ -96,12 +94,7 @@ class DbHelper private constructor(context: Context) :
                     put("name", name)
                     put("password", password)
                 }
-                val newRowId = db.insert("users", null, values)
-                if (newRowId == -1L) {
-                    Log.e("TAG", "Error inserting user: $values")
-                } else {
-                    Log.d("TAG", "User inserted with ID: $newRowId")
-                }
+                db.insert("users", null, values)
             }
         }
     }
@@ -127,5 +120,15 @@ class DbHelper private constructor(context: Context) :
             }
         }
         return users
+    }
+
+    fun saveGroup(groupName: String) {
+        val db = this.readableDatabase
+        val values = ContentValues().apply {
+            put("id", 1)
+            put("name", groupName)
+        }
+
+        db.insert("`group`", null, values)
     }
 }
