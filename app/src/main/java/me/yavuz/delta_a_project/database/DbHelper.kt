@@ -4,6 +4,8 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import me.yavuz.delta_a_project.model.Department
+import me.yavuz.delta_a_project.model.Group
 import me.yavuz.delta_a_project.model.User
 import me.yavuz.delta_a_project.model.UserType
 
@@ -125,10 +127,76 @@ class DbHelper private constructor(context: Context) :
     fun saveGroup(groupName: String) {
         val db = this.readableDatabase
         val values = ContentValues().apply {
-            put("id", 1)
             put("name", groupName)
         }
 
         db.insert("`group`", null, values)
+    }
+
+    fun getGroups(): List<Group> {
+        val groups = mutableListOf<Group>()
+        val sql =
+            "SELECT id, name FROM `group`"
+
+        val db = this.readableDatabase
+
+        db.rawQuery(sql, null).use {
+            while (it.moveToNext()) {
+                val id = it.getInt(it.getColumnIndexOrThrow("id"))
+                val name = it.getString(it.getColumnIndexOrThrow("name"))
+                groups.add(Group(id, name))
+            }
+        }
+
+        return groups
+    }
+
+    fun getGroupById(id: Int): Group? {
+        val db = this.readableDatabase
+        val sql = "SELECT id, name FROM `group` WHERE id = ?"
+
+        db.rawQuery(sql, arrayOf(id.toString())).use {
+            if (it.moveToFirst()) {
+                return Group(it.getInt(0), it.getString(1))
+            }
+        }
+
+        return null
+    }
+
+    fun getGroupByName(name: String): Group? {
+        val db = this.readableDatabase
+        val sql = "SELECT id, name FROM `group` WHERE name = ?"
+
+        db.rawQuery(sql, arrayOf(name)).use {
+            if (it.moveToFirst()) {
+                return Group(it.getInt(0), it.getString(1))
+            }
+        }
+
+        return null
+    }
+
+    fun saveDepartment(group: String, name: String) {
+        val db = this.writableDatabase
+        val values = ContentValues().apply {
+            put("group_id", getGroupByName(group)?.id)
+            put("name", name)
+        }
+
+        db.insert("department", null, values)
+    }
+
+    fun getDepartmentByName(name: String): Department? {
+        val db = this.readableDatabase
+        val sql = "SELECT id, group_id, name FROM `department` WHERE name = ?"
+
+        db.rawQuery(sql, arrayOf(name)).use {
+            if (it.moveToFirst()) {
+                return Department(it.getInt(0), it.getInt(1), it.getString(2))
+            }
+        }
+
+        return null
     }
 }
