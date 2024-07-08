@@ -1,10 +1,14 @@
 package me.yavuz.delta_a_project.database
 
+import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
+import me.yavuz.delta_a_project.model.User
+import me.yavuz.delta_a_project.model.UserType
 
-class DbHelper(context: Context):
+class DbHelper private constructor(context: Context) :
     SQLiteOpenHelper(
         context,
         DatabaseConstants.DATABASE_NAME,
@@ -12,6 +16,16 @@ class DbHelper(context: Context):
         DatabaseConstants.DATABASE_VERSION
     ) {
 
+    companion object {
+        @Volatile
+        private var instance: DbHelper? = null
+
+        fun getInstance(context: Context): DbHelper {
+            return instance ?: synchronized(this) {
+                instance ?: DbHelper(context.applicationContext).also { instance = it }
+            }
+        }
+    }
 
     override fun onCreate(db: SQLiteDatabase?) {
         //master data
@@ -58,4 +72,60 @@ class DbHelper(context: Context):
         return -1
     }
 
+    fun getUserTypes(): List<UserType> {
+        val sql = "SELECT id, name FROM user_type"
+        val db = this.readableDatabase
+        val list = mutableListOf<UserType>()
+        db.rawQuery(sql, null).use { cursor ->
+            while (cursor.moveToNext()) {
+                list.add(UserType(cursor.getInt(0), cursor.getString(1)))
+            }
+        }
+        return list
+    }
+
+    fun saveUser(userType: String, name: String, password: String) {
+        val db = this.readableDatabase
+        val sql = "SELECT id FROM user_type WHERE name = ?"
+        db.rawQuery(sql, arrayOf(userType)).use {
+            Log.d("TAG", "saveUser: $it")
+            if (it.moveToFirst()) {
+                val userTypeId = it.getInt(0)
+                val values = ContentValues().apply {
+                    put("user_type_id", userTypeId)
+                    put("name", name)
+                    put("password", password)
+                }
+                val newRowId = db.insert("users", null, values)
+                if (newRowId == -1L) {
+                    Log.e("TAG", "Error inserting user: $values")
+                } else {
+                    Log.d("TAG", "User inserted with ID: $newRowId")
+                }
+            }
+        }
+    }
+
+    fun getUsers(): List<User> {
+        val users = mutableListOf<User>()
+        val db = this.readableDatabase
+        val sql = """
+        SELECT s.id, s.name, s.password, ut.name AS user_type_name
+        FROM users s
+        INNER JOIN user_type ut ON s.user_type_id = ut.id
+    """
+        db.rawQuery(sql, null).use { cursor ->
+            if (cursor.moveToFirst()) {
+                do {
+                    val id = cursor.getInt(cursor.getColumnIndexOrThrow("id"))
+                    val name = cursor.getString(cursor.getColumnIndexOrThrow("name"))
+                    val password = cursor.getString(cursor.getColumnIndexOrThrow("password"))
+                    val userTypeName =
+                        cursor.getString(cursor.getColumnIndexOrThrow("user_type_name"))
+                    users.add(User(id, name, password, userTypeName))
+                } while (cursor.moveToNext())
+            }
+        }
+        return users
+    }
 }
