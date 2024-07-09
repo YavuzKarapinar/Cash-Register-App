@@ -73,29 +73,18 @@ class SettingsProductAddFragment : Fragment() {
 
     private fun saveOnClick() {
         val name = binding.productName.text.toString()
-        val price = binding.grossPrice.text.toString().toDouble()
-        val stock = binding.productStock.text.toString().toInt()
+        val price = binding.grossPrice.text.toString().toDoubleOrNull()
+        val stock = binding.productStock.text.toString().toIntOrNull()
         val department = binding.productDepartmentSpinner.selectedItem.toString()
         val tax = binding.productTaxSpinner.selectedItem.toString()
-        val productNumber = binding.productNumber.text.toString().toInt()
-
-        val product = Product(
-            0,
-            name,
-            price,
-            stock,
-            productNumber,
-            dbHelper.getTaxByName(tax)?.id ?: 0,
-            dbHelper.getDepartmentByName(department)?.id ?: 0
-        )
+        val productNumber = binding.productNumber.text.toString().toIntOrNull()
 
         if (TextUtils.isEmpty(name) ||
             TextUtils.isEmpty(price.toString()) ||
             TextUtils.isEmpty(stock.toString()) ||
             TextUtils.isEmpty(productNumber.toString()) ||
             TextUtils.isEmpty(department) ||
-            TextUtils.isEmpty(tax) ||
-            TextUtils.isEmpty(product.toString())
+            TextUtils.isEmpty(tax)
         ) {
             Toast.makeText(
                 binding.root.context,
@@ -103,6 +92,15 @@ class SettingsProductAddFragment : Fragment() {
                 Toast.LENGTH_SHORT
             ).show()
         } else {
+            val product = Product(
+                0,
+                name,
+                price!!,
+                stock!!,
+                productNumber!!,
+                dbHelper.getTaxByName(tax)?.id ?: 0,
+                dbHelper.getDepartmentByName(department)?.id ?: 0
+            )
             Toast.makeText(
                 binding.root.context,
                 "Product saved!",
