@@ -29,7 +29,8 @@ class SettingsFragment : Fragment() {
             "ADD GROUP",
             "ADD DEPARTMENT",
             "ADD TAX",
-            "ADD PRODUCT"
+            "ADD PRODUCT",
+            "LIST PRODUCT"
         )
         val childMap = hashMapOf(group[0] to staffChild, group[1] to masterDataChild)
 
@@ -47,6 +48,7 @@ class SettingsFragment : Fragment() {
                 "ADD DEPARTMENT" -> SettingsDepartmentAddFragment()
                 "ADD TAX" -> SettingsTaxAddFragment()
                 "ADD PRODUCT" -> SettingsProductAddFragment()
+                "LIST PRODUCT" -> SettingsProductListFragment()
                 else -> Fragment()
             }
 

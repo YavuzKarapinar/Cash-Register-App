@@ -4,23 +4,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".settings.SettingsUserListFragment">
+    tools:context=".settings.SettingsProductListFragment">
 
     <SearchView
-        android:id="@+id/userListSearchView"
+        android:id="@+id/productListSearchView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:iconifiedByDefault="false"
         android:background="@drawable/borders"
+        android:iconifiedByDefault="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/userListRecyclerView"
+        android:id="@+id/productListRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
@@ -28,11 +28,11 @@
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:background="@drawable/borders"
+        android:nestedScrollingEnabled="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        android:nestedScrollingEnabled="true"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/userListSearchView" />
+        app:layout_constraintTop_toBottomOf="@+id/productListSearchView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

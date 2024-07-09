@@ -8,8 +8,8 @@ import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import me.yavuz.delta_a_project.adapter.MainItemAdapter
+import me.yavuz.delta_a_project.database.DbHelper
 import me.yavuz.delta_a_project.databinding.FragmentMainBinding
-import me.yavuz.delta_a_project.model.Product
 import java.text.DecimalFormat
 
 class MainFragment : Fragment() {
@@ -18,6 +18,7 @@ class MainFragment : Fragment() {
     private lateinit var decimalFormat: DecimalFormat
     private lateinit var binding: FragmentMainBinding
     private val mainItemAdapter = MainItemAdapter()
+    private lateinit var dbHelper: DbHelper
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,18 +33,14 @@ class MainFragment : Fragment() {
 
     private fun declaringViews() {
         decimalFormat = DecimalFormat("#,###.##")
-        // test items
-        val product1 = Product(1, "test", 1.0, 1, 1, 1, 1)
-        val product2 = Product(1, "far", 1.0, 1, 1, 1, 1)
-        val product3 = Product(1, "bar", 1.0, 1, 1, 1, 1)
-        val itemList = arrayListOf(product1, product2, product3)
+        dbHelper = DbHelper.getInstance(binding.root.context)
 
         binding.itemRecyclerView.apply {
             layoutManager = LinearLayoutManager(binding.root.context)
             adapter = mainItemAdapter
         }
 
-        mainItemAdapter.setData(itemList)
+        mainItemAdapter.setData(dbHelper.getProducts())
     }
 
     private fun searchFilterListener() {

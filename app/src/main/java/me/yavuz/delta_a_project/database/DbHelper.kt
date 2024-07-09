@@ -267,4 +267,62 @@ class DbHelper private constructor(context: Context) :
         val l = db.insert("products", null, values)
         Log.d("TAG", l.toString())
     }
+
+    fun getProducts(): List<Product> {
+        val products = mutableListOf<Product>()
+        val db = this.readableDatabase
+        val sql =
+            "SELECT id, name, gross_price, stock, tax_id, department_id, product_number FROM products"
+
+        db.rawQuery(sql, null).use {
+            while (it.moveToNext()) {
+                val id = it.getInt(0)
+                val name = it.getString(1)
+                val grossPrice = it.getDouble(2)
+                val stock = it.getInt(3)
+                val taxId = it.getInt(4)
+                val departmentId = it.getInt(5)
+                val productNumber = it.getInt(6)
+                products.add(
+                    Product(
+                        id,
+                        name,
+                        grossPrice,
+                        stock,
+                        productNumber,
+                        taxId,
+                        departmentId
+                    )
+                )
+            }
+        }
+
+        return products
+    }
+
+    fun deleteProduct(product: Product) {
+        val db = this.writableDatabase
+        db.delete("products", "id = ?", arrayOf(product.id.toString()))
+    }
+
+    fun getProductById(value: Int): Product? {
+        val db = this.readableDatabase
+        val sql =
+            "SELECT id, name, gross_price, stock, tax_id, department_id, product_number FROM products WHERE id = ?"
+        db.rawQuery(sql, arrayOf(value.toString())).use {
+            if(it.moveToFirst()) {
+                val id = it.getInt(0)
+                val name = it.getString(1)
+                val grossPrice = it.getDouble(2)
+                val stock = it.getInt(3)
+                val taxId = it.getInt(4)
+                val departmentId = it.getInt(5)
+                val productNumber = it.getInt(6)
+
+                return Product(id, name, grossPrice, stock, productNumber, taxId, departmentId)
+            }
+        }
+
+        return null
+    }
 }
