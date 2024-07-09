@@ -29,11 +29,26 @@ class SettingsProductAddFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         dbHelper = DbHelper.getInstance(binding.root.context)
+        val value = arguments?.getInt("productId")
+        dbHelper = DbHelper.getInstance(binding.root.context)
+
+        if (value != null && value != 0) {
+            val product = dbHelper.getProductById(value)
+            binding.productName.setText(product?.name)
+            binding.grossPrice.setText(product?.price.toString())
+            binding.productStock.setText(product?.stock.toString())
+            binding.productNumber.setText(product?.productNumber.toString())
+
+            binding.productSave.setOnClickListener {
+                onUpdateClick()
+            }
+        } else {
+            binding.productSave.setOnClickListener {
+                saveOnClick()
+            }
+        }
 
         spinnerInitialize()
-        binding.productSave.setOnClickListener {
-            saveOnClick()
-        }
     }
 
     private fun spinnerInitialize() {
@@ -96,5 +111,20 @@ class SettingsProductAddFragment : Fragment() {
             dbHelper.saveProduct(product)
         }
 
+    }
+
+    private fun onUpdateClick() {
+        /*val name = binding.productName.text.toString()
+        val price = binding.grossPrice.text.toString().toDouble()
+        val stock = binding.productStock.text.toString().toInt()
+        val department = binding.productDepartmentSpinner.selectedItem.toString()
+        val tax = binding.productTaxSpinner.selectedItem.toString()
+        val productNumber = binding.productNumber.text.toString().toInt()
+*/
+        Toast.makeText(
+            binding.root.context,
+            "Product updated!",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 }
