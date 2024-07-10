@@ -10,14 +10,12 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import me.yavuz.delta_a_project.R
-import me.yavuz.delta_a_project.database.DbHelper
 import me.yavuz.delta_a_project.databinding.FragmentSettingsDepartmentAddBinding
 import me.yavuz.delta_a_project.viewmodel.MainViewModel
 
 class SettingsDepartmentAddFragment : Fragment() {
 
     private lateinit var binding: FragmentSettingsDepartmentAddBinding
-    private lateinit var dbHelper: DbHelper
     private val viewModel by viewModels<MainViewModel>()
 
     override fun onCreateView(
@@ -30,8 +28,6 @@ class SettingsDepartmentAddFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        dbHelper = DbHelper.getInstance(binding.root.context)
-
         arrayAdapterObserve()
         binding.departmentSave.setOnClickListener {
             val name = binding.departmentName.text.toString()
@@ -54,7 +50,7 @@ class SettingsDepartmentAddFragment : Fragment() {
                 Toast.LENGTH_SHORT
             ).show()
 
-            dbHelper.saveDepartment(group, name)
+            viewModel.saveDepartment(group, name)
         }
     }
 

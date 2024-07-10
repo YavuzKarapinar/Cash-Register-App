@@ -6,8 +6,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import me.yavuz.delta_a_project.database.repository.DepartmentRepository
 import me.yavuz.delta_a_project.database.repository.GroupRepository
 import me.yavuz.delta_a_project.database.repository.UserRepository
+import me.yavuz.delta_a_project.model.Department
 import me.yavuz.delta_a_project.model.Group
 import me.yavuz.delta_a_project.model.User
 import me.yavuz.delta_a_project.model.UserType
@@ -15,7 +17,7 @@ import me.yavuz.delta_a_project.model.UserType
 class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val userRepository = UserRepository(application)
     private val groupRepository = GroupRepository(application)
-
+    private val departmentRepository = DepartmentRepository(application)
 
     fun getUserByNameAndPassword(name: String, password: String): LiveData<User?> {
         val userLiveData = MutableLiveData<User?>()
@@ -64,6 +66,26 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun saveGroup(name: String) {
         viewModelScope.launch {
             groupRepository.saveGroup(name)
+        }
+    }
+
+    fun getDepartments(): LiveData<List<Department>> {
+        val departmentsLiveData = MutableLiveData<List<Department>>()
+        viewModelScope.launch {
+            val departments = departmentRepository.getDepartments()
+            departmentsLiveData.postValue(departments)
+        }
+
+        return departmentsLiveData
+    }
+
+    suspend fun getDepartmentByName(name: String): Department? {
+        return departmentRepository.getDepartmentByName(name)
+    }
+
+    fun saveDepartment(group: String, name: String) {
+        viewModelScope.launch {
+            departmentRepository.saveDepartment(group, name)
         }
     }
 }

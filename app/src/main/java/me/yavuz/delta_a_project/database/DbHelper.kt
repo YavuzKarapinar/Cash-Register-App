@@ -5,8 +5,6 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
-import me.yavuz.delta_a_project.database.dao.GroupDAO
-import me.yavuz.delta_a_project.model.Department
 import me.yavuz.delta_a_project.model.Product
 import me.yavuz.delta_a_project.model.Tax
 
@@ -60,42 +58,6 @@ class DbHelper private constructor(context: Context) :
     override fun onConfigure(db: SQLiteDatabase?) {
         super.onConfigure(db)
         db?.setForeignKeyConstraintsEnabled(true)
-    }
-
-    fun saveDepartment(group: String, name: String) {
-        val db = this.writableDatabase
-        val values = ContentValues().apply {
-            put("group_id", GroupDAO(this@DbHelper.writableDatabase).getGroupByName(group)?.id)
-            put("name", name)
-        }
-
-        db.insert("department", null, values)
-    }
-
-    fun getDepartmentByName(name: String): Department? {
-        val db = this.readableDatabase
-        val sql = "SELECT id, group_id, name FROM `department` WHERE name = ?"
-
-        db.rawQuery(sql, arrayOf(name)).use {
-            if (it.moveToFirst()) {
-                return Department(it.getInt(0), it.getInt(1), it.getString(2))
-            }
-        }
-
-        return null
-    }
-
-    fun getDepartments(): List<Department> {
-        val departments = mutableListOf<Department>()
-        val db = this.readableDatabase
-        val sql = "SELECT id, group_id, name FROM `department`"
-        db.rawQuery(sql, null).use {
-            while (it.moveToNext()) {
-                departments.add(Department(it.getInt(0), it.getInt(1), it.getString(2)))
-            }
-        }
-
-        return departments
     }
 
     fun saveTax(name: String, value: Double) {
