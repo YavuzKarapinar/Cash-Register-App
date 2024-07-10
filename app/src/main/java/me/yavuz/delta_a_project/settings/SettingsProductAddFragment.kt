@@ -32,6 +32,11 @@ class SettingsProductAddFragment : Fragment() {
         val value = arguments?.getInt("productId")
         dbHelper = DbHelper.getInstance(binding.root.context)
 
+        onPageShow(value)
+        spinnerInitialize()
+    }
+
+    private fun onPageShow(value: Int?) {
         if (value != null && value != 0) {
             val product = dbHelper.getProductById(value)
             binding.productName.setText(product?.name)
@@ -40,15 +45,15 @@ class SettingsProductAddFragment : Fragment() {
             binding.productNumber.setText(product?.productNumber.toString())
 
             binding.productSave.setOnClickListener {
-                onUpdateClick()
+                if (product != null) {
+                    onUpdateClick(product.id)
+                }
             }
         } else {
             binding.productSave.setOnClickListener {
                 saveOnClick()
             }
         }
-
-        spinnerInitialize()
     }
 
     private fun spinnerInitialize() {
@@ -73,36 +78,28 @@ class SettingsProductAddFragment : Fragment() {
 
     private fun saveOnClick() {
         val name = binding.productName.text.toString()
-        val price = binding.grossPrice.text.toString().toDouble()
-        val stock = binding.productStock.text.toString().toInt()
+        val price = binding.grossPrice.text.toString()
+        val stock = binding.productStock.text.toString()
         val department = binding.productDepartmentSpinner.selectedItem.toString()
         val tax = binding.productTaxSpinner.selectedItem.toString()
-        val productNumber = binding.productNumber.text.toString().toInt()
+        val productNumber = binding.productNumber.text.toString()
 
-        val product = Product(
-            0,
-            name,
-            price,
-            stock,
-            productNumber,
-            dbHelper.getTaxByName(tax)?.id ?: 0,
-            dbHelper.getDepartmentByName(department)?.id ?: 0
-        )
-
-        if (TextUtils.isEmpty(name) ||
-            TextUtils.isEmpty(price.toString()) ||
-            TextUtils.isEmpty(stock.toString()) ||
-            TextUtils.isEmpty(productNumber.toString()) ||
-            TextUtils.isEmpty(department) ||
-            TextUtils.isEmpty(tax) ||
-            TextUtils.isEmpty(product.toString())
-        ) {
+        if (isFieldsEmpty(name, price, stock, productNumber, department, tax)) {
             Toast.makeText(
                 binding.root.context,
                 "Please fill all fields!",
                 Toast.LENGTH_SHORT
             ).show()
         } else {
+            val product = Product(
+                0,
+                name,
+                price.toDouble(),
+                stock.toInt(),
+                productNumber.toInt(),
+                dbHelper.getTaxByName(tax)?.id ?: 0,
+                dbHelper.getDepartmentByName(department)?.id ?: 0
+            )
             Toast.makeText(
                 binding.root.context,
                 "Product saved!",
@@ -113,18 +110,52 @@ class SettingsProductAddFragment : Fragment() {
 
     }
 
-    private fun onUpdateClick() {
-        /*val name = binding.productName.text.toString()
-        val price = binding.grossPrice.text.toString().toDouble()
-        val stock = binding.productStock.text.toString().toInt()
+    private fun onUpdateClick(productId: Int) {
+        val name = binding.productName.text.toString()
+        val price = binding.grossPrice.text.toString()
+        val stock = binding.productStock.text.toString()
         val department = binding.productDepartmentSpinner.selectedItem.toString()
         val tax = binding.productTaxSpinner.selectedItem.toString()
-        val productNumber = binding.productNumber.text.toString().toInt()
-*/
-        Toast.makeText(
-            binding.root.context,
-            "Product updated!",
-            Toast.LENGTH_SHORT
-        ).show()
+        val productNumber = binding.productNumber.text.toString()
+
+        if (isFieldsEmpty(name, price, stock, productNumber, department, tax)) {
+            Toast.makeText(
+                binding.root.context,
+                "Please fill all fields!",
+                Toast.LENGTH_SHORT
+            ).show()
+        } else {
+            val newProduct = Product(
+                productId,
+                name,
+                price.toDouble(),
+                stock.toInt(),
+                productNumber.toInt(),
+                dbHelper.getTaxByName(tax)?.id ?: 0,
+                dbHelper.getDepartmentByName(department)?.id ?: 0
+            )
+            Toast.makeText(
+                binding.root.context,
+                "Product updated!",
+                Toast.LENGTH_SHORT
+            ).show()
+            dbHelper.updateProduct(newProduct)
+        }
+    }
+
+    private fun isFieldsEmpty(
+        name: String,
+        price: String,
+        stock: String,
+        productNumber: String,
+        department: String,
+        tax: String
+    ): Boolean {
+        return TextUtils.isEmpty(name) ||
+                TextUtils.isEmpty(price) ||
+                TextUtils.isEmpty(stock) ||
+                TextUtils.isEmpty(productNumber) ||
+                TextUtils.isEmpty(department) ||
+                TextUtils.isEmpty(tax)
     }
 }
