@@ -325,4 +325,17 @@ class DbHelper private constructor(context: Context) :
 
         return null
     }
+
+    fun updateProduct(product: Product) {
+        val db = this.writableDatabase
+        val values = ContentValues().apply {
+            put("name", product.name)
+            put("gross_price", product.price)
+            put("stock", product.stock)
+            put("tax_id", product.taxId)
+            put("department_id", product.departmentId)
+            put("product_number", product.productNumber)
+        }
+        db.update("products", values, "id = ?", arrayOf(product.id.toString()))
+    }
 }
