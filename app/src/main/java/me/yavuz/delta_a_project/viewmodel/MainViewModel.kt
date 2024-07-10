@@ -8,9 +8,11 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import me.yavuz.delta_a_project.database.repository.DepartmentRepository
 import me.yavuz.delta_a_project.database.repository.GroupRepository
+import me.yavuz.delta_a_project.database.repository.TaxRepository
 import me.yavuz.delta_a_project.database.repository.UserRepository
 import me.yavuz.delta_a_project.model.Department
 import me.yavuz.delta_a_project.model.Group
+import me.yavuz.delta_a_project.model.Tax
 import me.yavuz.delta_a_project.model.User
 import me.yavuz.delta_a_project.model.UserType
 
@@ -18,6 +20,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val userRepository = UserRepository(application)
     private val groupRepository = GroupRepository(application)
     private val departmentRepository = DepartmentRepository(application)
+    private val taxRepository = TaxRepository(application)
 
     fun getUserByNameAndPassword(name: String, password: String): LiveData<User?> {
         val userLiveData = MutableLiveData<User?>()
@@ -86,6 +89,26 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun saveDepartment(group: String, name: String) {
         viewModelScope.launch {
             departmentRepository.saveDepartment(group, name)
+        }
+    }
+
+    fun getTaxes(): LiveData<List<Tax>> {
+        val taxesLiveData = MutableLiveData<List<Tax>>()
+        viewModelScope.launch {
+            val taxes = taxRepository.getTaxes()
+            taxesLiveData.postValue(taxes)
+        }
+
+        return taxesLiveData
+    }
+
+    suspend fun getTaxByName(name: String): Tax? {
+        return taxRepository.getTaxByName(name)
+    }
+
+    fun saveTax(name: String, value: Double) {
+        viewModelScope.launch {
+            taxRepository.saveTax(name, value)
         }
     }
 }

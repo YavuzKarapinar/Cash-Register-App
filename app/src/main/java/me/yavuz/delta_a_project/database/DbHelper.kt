@@ -6,7 +6,6 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
 import me.yavuz.delta_a_project.model.Product
-import me.yavuz.delta_a_project.model.Tax
 
 class DbHelper private constructor(context: Context) :
     SQLiteOpenHelper(
@@ -58,43 +57,6 @@ class DbHelper private constructor(context: Context) :
     override fun onConfigure(db: SQLiteDatabase?) {
         super.onConfigure(db)
         db?.setForeignKeyConstraintsEnabled(true)
-    }
-
-    fun saveTax(name: String, value: Double) {
-        val db = this.writableDatabase
-
-        val values = ContentValues().apply {
-            put("name", name)
-            put("value", value)
-        }
-
-        db.insert("taxes", null, values)
-    }
-
-    fun getTaxByName(name: String): Tax? {
-        val db = this.readableDatabase
-        val sql = "SELECT id, name, value FROM taxes WHERE name = ?"
-
-        db.rawQuery(sql, arrayOf(name)).use {
-            if (it.moveToFirst()) {
-                return Tax(it.getInt(0), it.getString(1), it.getDouble(2))
-            }
-        }
-
-        return null
-    }
-
-    fun getTaxes(): List<Tax> {
-        val taxes = mutableListOf<Tax>()
-        val db = this.readableDatabase
-        val sql = "SELECT id, name, value FROM taxes"
-        db.rawQuery(sql, null).use {
-            while (it.moveToNext()) {
-                taxes.add(Tax(it.getInt(0), it.getString(1), it.getDouble(2)))
-            }
-        }
-
-        return taxes
     }
 
     fun saveProduct(product: Product) {

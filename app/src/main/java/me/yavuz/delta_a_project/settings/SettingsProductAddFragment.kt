@@ -86,13 +86,22 @@ class SettingsProductAddFragment : Fragment() {
     }
 
     private fun taxSpinnerInitialize() {
-        val taxList = dbHelper.getTaxes().map { it.name }
+        var taxList: List<String> = mutableListOf()
+        val taxAdapter = ArrayAdapter(
+            binding.root.context,
+            R.layout.spinner_item,
+            taxList
+        )
+
         binding.productTaxSpinner.apply {
-            adapter = ArrayAdapter(
-                binding.root.context,
-                R.layout.spinner_item,
-                taxList
-            )
+            adapter = taxAdapter
+        }
+
+        viewModel.getTaxes().observe(viewLifecycleOwner) {
+            taxList = it.map { tax -> tax.name }
+            taxAdapter.clear()
+            taxAdapter.addAll(taxList)
+            taxAdapter.notifyDataSetChanged()
         }
     }
 
@@ -116,7 +125,7 @@ class SettingsProductAddFragment : Fragment() {
                 price.toDouble(),
                 stock.toInt(),
                 productNumber.toInt(),
-                dbHelper.getTaxByName(tax)?.id ?: 0,
+                viewModel.getTaxByName(tax)?.id ?: 0,
                 viewModel.getDepartmentByName(name)?.id ?: 0
             )
             Toast.makeText(
@@ -150,7 +159,7 @@ class SettingsProductAddFragment : Fragment() {
                 price.toDouble(),
                 stock.toInt(),
                 productNumber.toInt(),
-                dbHelper.getTaxByName(tax)?.id ?: 0,
+                viewModel.getTaxByName(tax)?.id ?: 0,
                 viewModel.getDepartmentByName(department)?.id ?: 0
             )
             Toast.makeText(
