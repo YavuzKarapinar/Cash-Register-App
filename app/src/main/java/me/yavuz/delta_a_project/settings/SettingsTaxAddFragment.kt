@@ -7,13 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import me.yavuz.delta_a_project.database.DbHelper
+import androidx.fragment.app.viewModels
 import me.yavuz.delta_a_project.databinding.FragmentSettingsTaxAddBinding
+import me.yavuz.delta_a_project.viewmodel.MainViewModel
 
 class SettingsTaxAddFragment : Fragment() {
 
     private lateinit var binding: FragmentSettingsTaxAddBinding
-    private lateinit var dbHelper: DbHelper
+    private val viewModel by viewModels<MainViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -25,8 +26,6 @@ class SettingsTaxAddFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        dbHelper = DbHelper.getInstance(binding.root.context)
-
         binding.taxSave.setOnClickListener {
             onSaveClick()
         }
@@ -60,7 +59,7 @@ class SettingsTaxAddFragment : Fragment() {
                 "Tax saved!",
                 Toast.LENGTH_SHORT
             ).show()
-            dbHelper.saveTax(name, value)
+            viewModel.saveTax(name, value)
         }
     }
 }

@@ -8,15 +8,20 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import me.yavuz.delta_a_project.R
 import me.yavuz.delta_a_project.database.DbHelper
 import me.yavuz.delta_a_project.databinding.FragmentSettingsProductAddBinding
 import me.yavuz.delta_a_project.model.Product
+import me.yavuz.delta_a_project.viewmodel.MainViewModel
 
 class SettingsProductAddFragment : Fragment() {
 
     private lateinit var binding: FragmentSettingsProductAddBinding
     private lateinit var dbHelper: DbHelper
+    private val viewModel by viewModels<MainViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,57 +38,80 @@ class SettingsProductAddFragment : Fragment() {
         dbHelper = DbHelper.getInstance(binding.root.context)
 
         onPageShow(value)
-        spinnerInitialize()
+        departmentSpinnerInitialize()
+        taxSpinnerInitialize()
     }
 
     private fun onPageShow(value: Int?) {
-        if (value != null && value != 0) {
-            val product = dbHelper.getProductById(value)
-            binding.productName.setText(product?.name)
-            binding.grossPrice.setText(product?.price.toString())
-            binding.productStock.setText(product?.stock.toString())
-            binding.productNumber.setText(product?.productNumber.toString())
+        lifecycleScope.launch {
+            if (value != null && value != 0) {
+                val product = dbHelper.getProductById(value)
+                binding.productName.setText(product?.name)
+                binding.grossPrice.setText(product?.price.toString())
+                binding.productStock.setText(product?.stock.toString())
+                binding.productNumber.setText(product?.productNumber.toString())
 
-            binding.productSave.setOnClickListener {
-                if (product != null) {
-                    onUpdateClick(product.id)
+                binding.productSave.setOnClickListener {
+                    if (product != null) {
+                        lifecycleScope.launch { onUpdateClick(product.id) }
+                    }
+                }
+            } else {
+                binding.productSave.setOnClickListener {
+                    lifecycleScope.launch { saveOnClick() }
                 }
             }
-        } else {
-            binding.productSave.setOnClickListener {
-                saveOnClick()
-            }
         }
+
     }
 
-    private fun spinnerInitialize() {
-        val departmentList = dbHelper.getDepartments().map { it.name }
+    private fun departmentSpinnerInitialize() {
+        var departmentList: List<String> = mutableListOf()
+        val departmentAdapter = ArrayAdapter(
+            binding.root.context,
+            R.layout.spinner_item,
+            departmentList
+        )
+
         binding.productDepartmentSpinner.apply {
-            adapter = ArrayAdapter(
-                binding.root.context,
-                R.layout.spinner_item,
-                departmentList
-            )
+            adapter = departmentAdapter
         }
 
-        val taxList = dbHelper.getTaxes().map { it.name }
-        binding.productTaxSpinner.apply {
-            adapter = ArrayAdapter(
-                binding.root.context,
-                R.layout.spinner_item,
-                taxList
-            )
+        viewModel.getDepartments().observe(viewLifecycleOwner) {
+            departmentList = it.map { department -> department.name }
+            departmentAdapter.clear()
+            departmentAdapter.addAll(departmentList)
+            departmentAdapter.notifyDataSetChanged()
         }
     }
 
-    private fun saveOnClick() {
+    private fun taxSpinnerInitialize() {
+        var taxList: List<String> = mutableListOf()
+        val taxAdapter = ArrayAdapter(
+            binding.root.context,
+            R.layout.spinner_item,
+            taxList
+        )
+
+        binding.productTaxSpinner.apply {
+            adapter = taxAdapter
+        }
+
+        viewModel.getTaxes().observe(viewLifecycleOwner) {
+            taxList = it.map { tax -> tax.name }
+            taxAdapter.clear()
+            taxAdapter.addAll(taxList)
+            taxAdapter.notifyDataSetChanged()
+        }
+    }
+
+    private suspend fun saveOnClick() {
         val name = binding.productName.text.toString()
         val price = binding.grossPrice.text.toString()
         val stock = binding.productStock.text.toString()
         val department = binding.productDepartmentSpinner.selectedItem.toString()
         val tax = binding.productTaxSpinner.selectedItem.toString()
         val productNumber = binding.productNumber.text.toString()
-
         if (isFieldsEmpty(name, price, stock, productNumber, department, tax)) {
             Toast.makeText(
                 binding.root.context,
@@ -97,8 +125,8 @@ class SettingsProductAddFragment : Fragment() {
                 price.toDouble(),
                 stock.toInt(),
                 productNumber.toInt(),
-                dbHelper.getTaxByName(tax)?.id ?: 0,
-                dbHelper.getDepartmentByName(department)?.id ?: 0
+                viewModel.getTaxByName(tax)?.id ?: 0,
+                viewModel.getDepartmentByName(name)?.id ?: 0
             )
             Toast.makeText(
                 binding.root.context,
@@ -110,7 +138,7 @@ class SettingsProductAddFragment : Fragment() {
 
     }
 
-    private fun onUpdateClick(productId: Int) {
+    private suspend fun onUpdateClick(productId: Int) {
         val name = binding.productName.text.toString()
         val price = binding.grossPrice.text.toString()
         val stock = binding.productStock.text.toString()
@@ -131,8 +159,8 @@ class SettingsProductAddFragment : Fragment() {
                 price.toDouble(),
                 stock.toInt(),
                 productNumber.toInt(),
-                dbHelper.getTaxByName(tax)?.id ?: 0,
-                dbHelper.getDepartmentByName(department)?.id ?: 0
+                viewModel.getTaxByName(tax)?.id ?: 0,
+                viewModel.getDepartmentByName(department)?.id ?: 0
             )
             Toast.makeText(
                 binding.root.context,
