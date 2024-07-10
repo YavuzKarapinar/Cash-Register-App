@@ -8,14 +8,17 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import me.yavuz.delta_a_project.R
 import me.yavuz.delta_a_project.database.DbHelper
 import me.yavuz.delta_a_project.databinding.FragmentSettingsDepartmentAddBinding
+import me.yavuz.delta_a_project.viewmodel.MainViewModel
 
 class SettingsDepartmentAddFragment : Fragment() {
 
     private lateinit var binding: FragmentSettingsDepartmentAddBinding
     private lateinit var dbHelper: DbHelper
+    private val viewModel by viewModels<MainViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -28,20 +31,11 @@ class SettingsDepartmentAddFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         dbHelper = DbHelper.getInstance(binding.root.context)
-        val groupList = dbHelper.getGroups().map { it.name }
 
-        binding.departmentSpinner.apply {
-            adapter = ArrayAdapter(
-                binding.root.context,
-                R.layout.spinner_item,
-                groupList
-            )
-        }
-
+        arrayAdapterObserve()
         binding.departmentSave.setOnClickListener {
             val name = binding.departmentName.text.toString()
-            val position = binding.departmentSpinner.selectedItemPosition
-            val group = binding.departmentSpinner.getItemAtPosition(position) as String
+            val group = binding.departmentSpinner.selectedItem as String
             departmentSaveOnClick(group, name)
         }
     }
@@ -61,6 +55,24 @@ class SettingsDepartmentAddFragment : Fragment() {
             ).show()
 
             dbHelper.saveDepartment(group, name)
+        }
+    }
+
+    private fun arrayAdapterObserve() {
+        var groups: List<String> = mutableListOf()
+
+        val arrayAdapter = ArrayAdapter(
+            binding.root.context,
+            R.layout.spinner_item,
+            groups
+        )
+        binding.departmentSpinner.adapter = arrayAdapter
+
+        viewModel.getGroups().observe(viewLifecycleOwner) {
+            groups = it.map { group -> group.name }
+            arrayAdapter.clear()
+            arrayAdapter.addAll(groups)
+            arrayAdapter.notifyDataSetChanged()
         }
     }
 }

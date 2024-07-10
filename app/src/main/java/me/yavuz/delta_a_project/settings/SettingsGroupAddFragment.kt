@@ -7,12 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import me.yavuz.delta_a_project.database.DbHelper
+import androidx.fragment.app.viewModels
 import me.yavuz.delta_a_project.databinding.FragmentSettingsGroupAddBinding
+import me.yavuz.delta_a_project.viewmodel.MainViewModel
 
 class SettingsGroupAddFragment : Fragment() {
 
     private lateinit var binding: FragmentSettingsGroupAddBinding
+    private val viewModel by viewModels<MainViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,7 +34,6 @@ class SettingsGroupAddFragment : Fragment() {
 
     private fun onSaveClick() {
         val groupName = binding.groupName.text.toString()
-        val dbHelper = DbHelper.getInstance(binding.root.context)
 
         if (TextUtils.isEmpty(groupName)) {
             Toast.makeText(
@@ -47,7 +48,7 @@ class SettingsGroupAddFragment : Fragment() {
                 Toast.LENGTH_SHORT
             ).show()
 
-            dbHelper.saveGroup(groupName)
+            viewModel.saveGroup(groupName)
         }
     }
 }
