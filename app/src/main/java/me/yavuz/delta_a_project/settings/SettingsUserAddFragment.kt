@@ -8,13 +8,15 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import me.yavuz.delta_a_project.R
-import me.yavuz.delta_a_project.database.DbHelper
 import me.yavuz.delta_a_project.databinding.FragmentSettingsUserAddBinding
+import me.yavuz.delta_a_project.viewmodel.MainViewModel
 
 class SettingsUserAddFragment : Fragment() {
 
     private lateinit var binding: FragmentSettingsUserAddBinding
+    private val viewModel by viewModels<MainViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -26,18 +28,25 @@ class SettingsUserAddFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val dbHelper = DbHelper.getInstance(binding.root.context)
-        val userTypes = dbHelper.getUserTypes().map { it.name }
+        var types: List<String> = mutableListOf()
+
         val adapter =
-            ArrayAdapter(binding.root.context, R.layout.spinner_item, userTypes)
+            ArrayAdapter(binding.root.context, R.layout.spinner_item, types)
         binding.spinner.adapter = adapter
 
+        viewModel.getUserTypes().observe(viewLifecycleOwner) {
+            types = it.map { type -> type.name }
+            adapter.clear()
+            adapter.addAll(types)
+            adapter.notifyDataSetChanged()
+        }
+
         binding.button.setOnClickListener {
-            userSave(dbHelper)
+            userSave()
         }
     }
 
-    private fun userSave(dbHelper: DbHelper) {
+    private fun userSave() {
         val position = binding.spinner.selectedItemPosition
         val userType = binding.spinner.getItemAtPosition(position) as String
         val name = binding.userSaveName.text.toString()
@@ -56,7 +65,7 @@ class SettingsUserAddFragment : Fragment() {
         }
 
         if (password == passwordCorrection) {
-            dbHelper.saveUser(userType, name, password)
+            viewModel.saveUser(userType, name, password)
             Toast.makeText(
                 binding.root.context,
                 "User saved!",

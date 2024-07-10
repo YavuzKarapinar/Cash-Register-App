@@ -1,20 +1,22 @@
 package me.yavuz.delta_a_project.settings
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import me.yavuz.delta_a_project.adapter.SettingsUserListAdapter
-import me.yavuz.delta_a_project.database.DbHelper
 import me.yavuz.delta_a_project.databinding.FragmentSettingsUserListBinding
+import me.yavuz.delta_a_project.viewmodel.MainViewModel
 
 class SettingsUserListFragment : Fragment() {
 
     private lateinit var binding: FragmentSettingsUserListBinding
     private var itemAdapter = SettingsUserListAdapter()
+    private val viewModel by viewModels<MainViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -26,13 +28,15 @@ class SettingsUserListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val dbHelper = DbHelper.getInstance(binding.root.context)
         binding.userListRecyclerView.apply {
             layoutManager = LinearLayoutManager(binding.root.context)
             adapter = itemAdapter
         }
 
-        itemAdapter.setData(dbHelper.getUsers())
+        viewModel.getUsers().observe(viewLifecycleOwner) {
+            itemAdapter.setData(it)
+        }
+
         searchFilterListener()
     }
 
