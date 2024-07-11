@@ -10,7 +10,9 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.yavuz.delta_a_project.R
 import me.yavuz.delta_a_project.database.DbHelper
 import me.yavuz.delta_a_project.databinding.FragmentSettingsProductAddBinding
@@ -35,7 +37,6 @@ class SettingsProductAddFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         dbHelper = DbHelper.getInstance(binding.root.context)
         val value = arguments?.getInt("productId")
-        dbHelper = DbHelper.getInstance(binding.root.context)
 
         onPageShow(value)
         departmentSpinnerInitialize()
@@ -45,15 +46,15 @@ class SettingsProductAddFragment : Fragment() {
     private fun onPageShow(value: Int?) {
         lifecycleScope.launch {
             if (value != null && value != 0) {
-                val product = dbHelper.getProductById(value)
-                binding.productName.setText(product?.name)
-                binding.grossPrice.setText(product?.price.toString())
-                binding.productStock.setText(product?.stock.toString())
-                binding.productNumber.setText(product?.productNumber.toString())
+                val product = withContext(Dispatchers.IO) { viewModel.getProductById(value) }
+                product?.let {
+                    binding.productName.setText(it.name)
+                    binding.grossPrice.setText(it.price.toString())
+                    binding.productStock.setText(it.stock.toString())
+                    binding.productNumber.setText(it.productNumber.toString())
 
-                binding.productSave.setOnClickListener {
-                    if (product != null) {
-                        lifecycleScope.launch { onUpdateClick(product.id) }
+                    binding.productSave.setOnClickListener {
+                        lifecycleScope.launch { onUpdateClick(value) }
                     }
                 }
             } else {
@@ -62,7 +63,6 @@ class SettingsProductAddFragment : Fragment() {
                 }
             }
         }
-
     }
 
     private fun departmentSpinnerInitialize() {
@@ -112,6 +112,7 @@ class SettingsProductAddFragment : Fragment() {
         val department = binding.productDepartmentSpinner.selectedItem.toString()
         val tax = binding.productTaxSpinner.selectedItem.toString()
         val productNumber = binding.productNumber.text.toString()
+
         if (isFieldsEmpty(name, price, stock, productNumber, department, tax)) {
             Toast.makeText(
                 binding.root.context,
@@ -119,23 +120,25 @@ class SettingsProductAddFragment : Fragment() {
                 Toast.LENGTH_SHORT
             ).show()
         } else {
+            val departmentId =
+                withContext(Dispatchers.IO) { viewModel.getDepartmentByName(department)?.id ?: 0 }
+            val taxId = withContext(Dispatchers.IO) { viewModel.getTaxByName(tax)?.id ?: 0 }
             val product = Product(
                 0,
                 name,
                 price.toDouble(),
                 stock.toInt(),
                 productNumber.toInt(),
-                viewModel.getTaxByName(tax)?.id ?: 0,
-                viewModel.getDepartmentByName(name)?.id ?: 0
+                taxId,
+                departmentId
             )
+            withContext(Dispatchers.IO) { viewModel.saveProduct(product) }
             Toast.makeText(
                 binding.root.context,
                 "Product saved!",
                 Toast.LENGTH_SHORT
             ).show()
-            dbHelper.saveProduct(product)
         }
-
     }
 
     private suspend fun onUpdateClick(productId: Int) {
@@ -153,21 +156,24 @@ class SettingsProductAddFragment : Fragment() {
                 Toast.LENGTH_SHORT
             ).show()
         } else {
+            val departmentId =
+                withContext(Dispatchers.IO) { viewModel.getDepartmentByName(department)?.id ?: 0 }
+            val taxId = withContext(Dispatchers.IO) { viewModel.getTaxByName(tax)?.id ?: 0 }
             val newProduct = Product(
                 productId,
                 name,
                 price.toDouble(),
                 stock.toInt(),
                 productNumber.toInt(),
-                viewModel.getTaxByName(tax)?.id ?: 0,
-                viewModel.getDepartmentByName(department)?.id ?: 0
+                taxId,
+                departmentId
             )
+            withContext(Dispatchers.IO) { viewModel.updateProduct(newProduct) }
             Toast.makeText(
                 binding.root.context,
                 "Product updated!",
                 Toast.LENGTH_SHORT
             ).show()
-            dbHelper.updateProduct(newProduct)
         }
     }
 

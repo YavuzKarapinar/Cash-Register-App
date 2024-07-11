@@ -6,10 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import me.yavuz.delta_a_project.adapter.MainItemAdapter
-import me.yavuz.delta_a_project.database.DbHelper
 import me.yavuz.delta_a_project.databinding.FragmentMainBinding
+import me.yavuz.delta_a_project.viewmodel.MainViewModel
 import java.text.DecimalFormat
 
 class MainFragment : Fragment() {
@@ -18,29 +19,41 @@ class MainFragment : Fragment() {
     private lateinit var decimalFormat: DecimalFormat
     private lateinit var binding: FragmentMainBinding
     private val mainItemAdapter = MainItemAdapter()
-    private lateinit var dbHelper: DbHelper
+    private val viewModel by viewModels<MainViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentMainBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         declaringViews()
         searchFilterListener()
         buttonClickListeners()
-        return binding.root
     }
 
     private fun declaringViews() {
         decimalFormat = DecimalFormat("#,###.##")
-        dbHelper = DbHelper.getInstance(binding.root.context)
 
+        recyclerViewInitialize()
+        observeProduct()
+    }
+
+    private fun recyclerViewInitialize() {
         binding.itemRecyclerView.apply {
             layoutManager = LinearLayoutManager(binding.root.context)
             adapter = mainItemAdapter
         }
+    }
 
-        mainItemAdapter.setData(dbHelper.getProducts())
+    private fun observeProduct() {
+        viewModel.getProducts().observe(viewLifecycleOwner) {
+            mainItemAdapter.setData(it)
+        }
     }
 
     private fun searchFilterListener() {
