@@ -52,6 +52,10 @@ class SettingsProductListAdapter :
         submitList(updatedList)
     }
 
+    fun getData(): List<Product> {
+        return currentList
+    }
+
     override fun getFilter(): Filter {
         return object : Filter() {
             override fun performFiltering(constraint: CharSequence?): FilterResults {

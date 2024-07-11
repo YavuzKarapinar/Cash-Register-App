@@ -8,10 +8,12 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import me.yavuz.delta_a_project.database.repository.DepartmentRepository
 import me.yavuz.delta_a_project.database.repository.GroupRepository
+import me.yavuz.delta_a_project.database.repository.ProductRepository
 import me.yavuz.delta_a_project.database.repository.TaxRepository
 import me.yavuz.delta_a_project.database.repository.UserRepository
 import me.yavuz.delta_a_project.model.Department
 import me.yavuz.delta_a_project.model.Group
+import me.yavuz.delta_a_project.model.Product
 import me.yavuz.delta_a_project.model.Tax
 import me.yavuz.delta_a_project.model.User
 import me.yavuz.delta_a_project.model.UserType
@@ -21,6 +23,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val groupRepository = GroupRepository(application)
     private val departmentRepository = DepartmentRepository(application)
     private val taxRepository = TaxRepository(application)
+    private val productRepository = ProductRepository(application)
 
     fun getUserByNameAndPassword(name: String, password: String): LiveData<User?> {
         val userLiveData = MutableLiveData<User?>()
@@ -109,6 +112,37 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun saveTax(name: String, value: Double) {
         viewModelScope.launch {
             taxRepository.saveTax(name, value)
+        }
+    }
+
+    fun getProducts(): LiveData<List<Product>> {
+        val productsLiveData = MutableLiveData<List<Product>>()
+        viewModelScope.launch {
+            val products = productRepository.getProducts()
+            productsLiveData.postValue(products)
+        }
+        return productsLiveData
+    }
+
+    suspend fun getProductById(id: Int): Product? {
+        return productRepository.getProductById(id)
+    }
+
+    fun saveProduct(product: Product) {
+        viewModelScope.launch {
+            productRepository.saveProduct(product)
+        }
+    }
+
+    fun deleteProduct(product: Product) {
+        viewModelScope.launch {
+            productRepository.deleteProduct(product)
+        }
+    }
+
+    fun updateProduct(product: Product) {
+        viewModelScope.launch {
+            productRepository.updateProduct(product)
         }
     }
 }
