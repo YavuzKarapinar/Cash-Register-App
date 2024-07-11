@@ -8,8 +8,10 @@ import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import me.yavuz.delta_a_project.adapter.CartAdapter
 import me.yavuz.delta_a_project.adapter.MainItemAdapter
 import me.yavuz.delta_a_project.databinding.FragmentMainBinding
+import me.yavuz.delta_a_project.model.Product
 import me.yavuz.delta_a_project.viewmodel.MainViewModel
 import java.text.DecimalFormat
 
@@ -18,8 +20,10 @@ class MainFragment : Fragment() {
     private val builder: StringBuilder = StringBuilder()
     private lateinit var decimalFormat: DecimalFormat
     private lateinit var binding: FragmentMainBinding
-    private val mainItemAdapter = MainItemAdapter()
+    private val mainItemAdapter by lazy { MainItemAdapter { addToCart(it) } }
     private val viewModel by viewModels<MainViewModel>()
+    private val cartItems: MutableList<Pair<Product, Int>> = mutableListOf()
+    private lateinit var cartAdapter: CartAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,16 +38,21 @@ class MainFragment : Fragment() {
         declaringViews()
         searchFilterListener()
         buttonClickListeners()
+        cartAdapter = CartAdapter(cartItems)
+        binding.cartRecyclerView.apply {
+            adapter = cartAdapter
+            layoutManager = LinearLayoutManager(binding.root.context)
+        }
     }
 
     private fun declaringViews() {
         decimalFormat = DecimalFormat("#,###.##")
 
-        recyclerViewInitialize()
+        itemRecyclerInitialize()
         observeProduct()
     }
 
-    private fun recyclerViewInitialize() {
+    private fun itemRecyclerInitialize() {
         binding.itemRecyclerView.apply {
             layoutManager = LinearLayoutManager(binding.root.context)
             adapter = mainItemAdapter
@@ -70,50 +79,17 @@ class MainFragment : Fragment() {
     }
 
     private fun buttonClickListeners() {
-        binding.button0.setOnClickListener {
-            appendToBuilder("0")
-        }
-
-        binding.button1.setOnClickListener {
-            appendToBuilder("1")
-        }
-
-        binding.button2.setOnClickListener {
-            appendToBuilder("2")
-        }
-
-        binding.button3.setOnClickListener {
-            appendToBuilder("3")
-        }
-
-        binding.button4.setOnClickListener {
-            appendToBuilder("4")
-        }
-
-        binding.button5.setOnClickListener {
-            appendToBuilder("5")
-        }
-
-        binding.button6.setOnClickListener {
-            appendToBuilder("6")
-        }
-
-        binding.button7.setOnClickListener {
-            appendToBuilder("7")
-        }
-
-        binding.button8.setOnClickListener {
-            appendToBuilder("8")
-        }
-
-        binding.button9.setOnClickListener {
-            appendToBuilder("9")
-        }
-
-        binding.button00.setOnClickListener {
-            appendToBuilder("00")
-        }
-
+        binding.button0.setOnClickListener { appendToBuilder("0") }
+        binding.button1.setOnClickListener { appendToBuilder("1") }
+        binding.button2.setOnClickListener { appendToBuilder("2") }
+        binding.button3.setOnClickListener { appendToBuilder("3") }
+        binding.button4.setOnClickListener { appendToBuilder("4") }
+        binding.button5.setOnClickListener { appendToBuilder("5") }
+        binding.button6.setOnClickListener { appendToBuilder("6") }
+        binding.button7.setOnClickListener { appendToBuilder("7") }
+        binding.button8.setOnClickListener { appendToBuilder("8") }
+        binding.button9.setOnClickListener { appendToBuilder("9") }
+        binding.button00.setOnClickListener { appendToBuilder("00") }
         binding.buttonC.setOnClickListener {
             builder.clear()
             updateTextView()
@@ -133,5 +109,9 @@ class MainFragment : Fragment() {
         } else {
             binding.showNumbers.text = "0.00"
         }
+    }
+
+    private fun addToCart(product: Product) {
+        cartAdapter.updateItem(product)
     }
 }

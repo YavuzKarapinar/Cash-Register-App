@@ -10,10 +10,10 @@ import androidx.recyclerview.widget.RecyclerView
 import me.yavuz.delta_a_project.databinding.FragmentMainItemBinding
 import me.yavuz.delta_a_project.model.Product
 
-class MainItemAdapter : ListAdapter<Product, MainItemAdapter.MainItemViewHolder>(diffUtil), Filterable {
+class MainItemAdapter(private val onItemClick: (Product) -> Unit) :
+    ListAdapter<Product, MainItemAdapter.MainItemViewHolder>(diffUtil), Filterable {
 
     private var fullItemList: List<Product> = emptyList()
-    var onItemClick: ((Product) -> Unit)? = null
 
     inner class MainItemViewHolder(private val binding: FragmentMainItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -25,7 +25,12 @@ class MainItemAdapter : ListAdapter<Product, MainItemAdapter.MainItemViewHolder>
 
         init {
             binding.root.setOnClickListener {
-                onItemClick?.invoke(fullItemList[adapterPosition])
+                val product = fullItemList[adapterPosition]
+                if (product.stock > 0) {
+                    product.stock -= 1
+                    notifyItemChanged(adapterPosition)
+                    onItemClick(product)
+                }
             }
         }
     }
