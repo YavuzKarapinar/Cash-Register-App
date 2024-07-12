@@ -9,11 +9,13 @@ import kotlinx.coroutines.launch
 import me.yavuz.delta_a_project.database.repository.DepartmentRepository
 import me.yavuz.delta_a_project.database.repository.GroupRepository
 import me.yavuz.delta_a_project.database.repository.ProductRepository
+import me.yavuz.delta_a_project.database.repository.SellingProcessRepository
 import me.yavuz.delta_a_project.database.repository.TaxRepository
 import me.yavuz.delta_a_project.database.repository.UserRepository
 import me.yavuz.delta_a_project.model.Department
 import me.yavuz.delta_a_project.model.Group
 import me.yavuz.delta_a_project.model.Product
+import me.yavuz.delta_a_project.model.SellingProcess
 import me.yavuz.delta_a_project.model.Tax
 import me.yavuz.delta_a_project.model.User
 import me.yavuz.delta_a_project.model.UserType
@@ -24,6 +26,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val departmentRepository = DepartmentRepository(application)
     private val taxRepository = TaxRepository(application)
     private val productRepository = ProductRepository(application)
+    private val sellingProcessRepository = SellingProcessRepository(application)
 
     fun getUserByNameAndPassword(name: String, password: String): LiveData<User?> {
         val userLiveData = MutableLiveData<User?>()
@@ -109,6 +112,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return taxRepository.getTaxByName(name)
     }
 
+    suspend fun getTaxById(id: Int): Tax? {
+        return taxRepository.getTaxById(id)
+    }
+
     fun saveTax(name: String, value: Double) {
         viewModelScope.launch {
             taxRepository.saveTax(name, value)
@@ -143,6 +150,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun updateProduct(product: Product) {
         viewModelScope.launch {
             productRepository.updateProduct(product)
+        }
+    }
+
+    suspend fun getSellingProcessById(id: Int): SellingProcess? {
+        return sellingProcessRepository.getSellingProcessById(id)
+    }
+
+    fun saveSellingProcess(sellingProcess: SellingProcess) {
+        viewModelScope.launch {
+            sellingProcessRepository.saveSellingProcess(sellingProcess)
         }
     }
 }

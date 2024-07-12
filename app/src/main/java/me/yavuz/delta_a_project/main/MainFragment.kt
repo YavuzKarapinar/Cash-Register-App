@@ -5,15 +5,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.yavuz.delta_a_project.adapter.CartAdapter
 import me.yavuz.delta_a_project.adapter.MainItemAdapter
 import me.yavuz.delta_a_project.databinding.FragmentMainBinding
 import me.yavuz.delta_a_project.model.Product
+import me.yavuz.delta_a_project.model.SellingProcess
 import me.yavuz.delta_a_project.viewmodel.MainViewModel
+import me.yavuz.delta_a_project.viewmodel.SharedViewModel
 import java.text.DecimalFormat
+import java.util.Locale
 
 class MainFragment : Fragment() {
 
@@ -24,6 +33,7 @@ class MainFragment : Fragment() {
     private val viewModel by viewModels<MainViewModel>()
     private val cartItems: MutableList<Pair<Product, Int>> = mutableListOf()
     private lateinit var cartAdapter: CartAdapter
+    private val sharedViewModel by activityViewModels<SharedViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,21 +45,73 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        declaringViews()
+        decimalFormat = DecimalFormat("#,###.##")
         searchFilterListener()
         buttonClickListeners()
+        cartRecyclerInitialize()
+        itemRecyclerInitialize()
+        observeProduct()
+        onPaymentClick()
+
+    }
+
+    private fun onPaymentClick() {
+        binding.paymentButton.setOnClickListener {
+            sharedViewModel.data.observe(viewLifecycleOwner) { userId ->
+                lifecycleScope.launch {
+                    cartForEachItem(userId)
+                    clearViews()
+                    receiptShow()
+                }
+            }
+        }
+    }
+
+    private fun receiptShow() {
+        val builder = AlertDialog.Builder(binding.root.context)
+        builder.setTitle("Payment Successful")
+        builder.setMessage("Thank you for your purchase!")
+        builder.setPositiveButton("OK") { dialog, _ ->
+            dialog.dismiss()
+        }
+        builder.show()
+    }
+
+    private suspend fun cartForEachItem(userId: Int) {
+        cartItems.forEach { item ->
+            val tax =
+                withContext(Dispatchers.IO) { viewModel.getTaxById(item.first.taxId) }
+            val priceSell = (item.first.price) / ((tax!!.value / 100) + 1)
+            val sellingProcess = SellingProcess(
+                id = 0,
+                quantity = item.second,
+                priceSell = String.format(Locale.getDefault(), "%.1f", priceSell).toDouble(),
+                userId = userId,
+                sellingProcessTypeId = 1,
+                productId = item.first.id
+            )
+            val product = viewModel.getProductById(item.first.id)
+            product!!.stock -= item.second
+
+            viewModel.updateProduct(product!!)
+            viewModel.saveSellingProcess(sellingProcess)
+        }
+    }
+
+    private fun clearViews() {
+        cartItems.clear()
+        cartAdapter.notifyDataSetChanged()
+        binding.mainTotalPrice.text = "Total: 0.00"
+        binding.showNumbers.text = "0.00"
+        builder.clear()
+    }
+
+    private fun cartRecyclerInitialize() {
         cartAdapter = CartAdapter(cartItems)
         binding.cartRecyclerView.apply {
             adapter = cartAdapter
             layoutManager = LinearLayoutManager(binding.root.context)
         }
-    }
-
-    private fun declaringViews() {
-        decimalFormat = DecimalFormat("#,###.##")
-
-        itemRecyclerInitialize()
-        observeProduct()
     }
 
     private fun itemRecyclerInitialize() {
@@ -113,5 +175,8 @@ class MainFragment : Fragment() {
 
     private fun addToCart(product: Product) {
         cartAdapter.updateItem(product)
+        val totalPrice = cartItems.sumOf { it.first.price * it.second }
+        val totalPriceFormatted = String.format(Locale.getDefault(), "%.1f", totalPrice)
+        binding.mainTotalPrice.text = "Total: $totalPriceFormatted"
     }
 }

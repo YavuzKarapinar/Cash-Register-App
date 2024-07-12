@@ -30,6 +30,17 @@ class TaxDAO(private val db: SQLiteDatabase) {
         return null
     }
 
+    fun getTaxById(id: Int): Tax? {
+        val sql = "SELECT id, name, value FROM taxes WHERE id = ?"
+        db.rawQuery(sql, arrayOf(id.toString())).use {
+            if (it.moveToFirst()) {
+                return Tax(it.getInt(0), it.getString(1), it.getDouble(2))
+            }
+        }
+
+        return null
+    }
+
     fun saveTax(name: String, value: Double) {
         val values = ContentValues().apply {
             put("name", name)

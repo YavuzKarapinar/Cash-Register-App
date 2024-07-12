@@ -23,6 +23,12 @@ class TaxRepository(context: Context) {
         }
     }
 
+    suspend fun getTaxById(id: Int): Tax? {
+        return withContext(Dispatchers.IO) {
+            taxDAO.getTaxById(id)
+        }
+    }
+
     suspend fun saveTax(name: String, value: Double) {
         withContext(Dispatchers.IO) {
             taxDAO.saveTax(name, value)
