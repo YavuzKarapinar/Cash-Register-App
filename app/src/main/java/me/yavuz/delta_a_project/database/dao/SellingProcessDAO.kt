@@ -3,6 +3,7 @@ package me.yavuz.delta_a_project.database.dao
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
 import me.yavuz.delta_a_project.model.SellingProcess
+import me.yavuz.delta_a_project.model.SellingProcessType
 
 class SellingProcessDAO(private val db: SQLiteDatabase) {
 
@@ -40,5 +41,23 @@ class SellingProcessDAO(private val db: SQLiteDatabase) {
         }
 
         db.insert("selling_process", null, values)
+    }
+
+    fun getSellingTypeById(id: Int): SellingProcessType? {
+        val sql =
+            "SELECT id, name " +
+                    "FROM selling_process_type " +
+                    "WHERE id = ?"
+
+        db.rawQuery(sql, arrayOf(id.toString())).use {
+            if (it.moveToFirst()) {
+                return SellingProcessType(
+                    it.getInt(0),
+                    it.getString(1)
+                )
+            }
+        }
+
+        return null
     }
 }

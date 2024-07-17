@@ -14,14 +14,19 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.yavuz.delta_a_project.R
 import me.yavuz.delta_a_project.adapter.CartAdapter
 import me.yavuz.delta_a_project.adapter.MainItemAdapter
+import me.yavuz.delta_a_project.adapter.ReceiptItemAdapter
 import me.yavuz.delta_a_project.databinding.FragmentMainBinding
+import me.yavuz.delta_a_project.databinding.ReceiptDialogBinding
 import me.yavuz.delta_a_project.model.Product
 import me.yavuz.delta_a_project.model.SellingProcess
 import me.yavuz.delta_a_project.viewmodel.MainViewModel
 import me.yavuz.delta_a_project.viewmodel.SharedViewModel
 import java.text.DecimalFormat
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 class MainFragment : Fragment() {
@@ -52,16 +57,17 @@ class MainFragment : Fragment() {
         itemRecyclerInitialize()
         observeProduct()
         onPaymentClick()
-
     }
 
     private fun onPaymentClick() {
         binding.paymentButton.setOnClickListener {
-            sharedViewModel.data.observe(viewLifecycleOwner) { userId ->
-                lifecycleScope.launch {
-                    cartForEachItem(userId)
-                    clearViews()
-                    receiptShow()
+            if (cartItems.isNotEmpty()) {
+                sharedViewModel.data.observe(viewLifecycleOwner) { userId ->
+                    lifecycleScope.launch {
+                        receiptShow()
+                        cartForEachItem(userId)
+                        clearViews()
+                    }
                 }
             }
         }
@@ -70,11 +76,46 @@ class MainFragment : Fragment() {
     private fun receiptShow() {
         val builder = AlertDialog.Builder(binding.root.context)
         builder.setTitle("Payment Successful")
-        builder.setMessage("Thank you for your purchase!")
+
+        val alertBinding = receiptDialogBinding()
+
+        setReceiptDateAndClock(alertBinding)
+        setReceiptTotalPrices(alertBinding)
+
+        builder.setView(alertBinding.root)
         builder.setPositiveButton("OK") { dialog, _ ->
             dialog.dismiss()
         }
         builder.show()
+    }
+
+    private fun setReceiptTotalPrices(alertBinding: ReceiptDialogBinding) {
+        val totalPrice = cartItems.sumOf { it.first.price * it.second }
+        val totalPriceFormatted = String.format(Locale.getDefault(), "%.1f", totalPrice)
+        alertBinding.totalSellingPrice.text = totalPriceFormatted
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                val sellingType = viewModel.getSellingTypeById(1)
+                alertBinding.sellingType.text = sellingType?.name ?: "Other"
+            }
+        }
+    }
+
+    private fun setReceiptDateAndClock(alertBinding: ReceiptDialogBinding) {
+        val date = Date(System.currentTimeMillis())
+        alertBinding.date.text = SimpleDateFormat.getDateInstance().format(date)
+        alertBinding.clock.text = SimpleDateFormat.getTimeInstance().format(date)
+    }
+
+    private fun receiptDialogBinding(): ReceiptDialogBinding {
+        val customLayout =
+            layoutInflater.inflate(R.layout.receipt_dialog, binding.root, false)
+        val alertBinding = ReceiptDialogBinding.bind(customLayout)
+        alertBinding.cartItemsRecycler.apply {
+            adapter = ReceiptItemAdapter(cartItems)
+            layoutManager = LinearLayoutManager(alertBinding.root.context)
+        }
+        return alertBinding
     }
 
     private suspend fun cartForEachItem(userId: Int) {
@@ -98,7 +139,7 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun clearViews() {
+    private fun clearViews() { // todo: when clearing views its not rearranging stocks
         cartItems.clear()
         cartAdapter.notifyDataSetChanged()
         binding.mainTotalPrice.text = "Total: 0.00"
@@ -153,7 +194,7 @@ class MainFragment : Fragment() {
         binding.button9.setOnClickListener { appendToBuilder("9") }
         binding.button00.setOnClickListener { appendToBuilder("00") }
         binding.buttonC.setOnClickListener {
-            builder.clear()
+            builder.clear() // todo: add clear views for this segment
             updateTextView()
         }
     }
