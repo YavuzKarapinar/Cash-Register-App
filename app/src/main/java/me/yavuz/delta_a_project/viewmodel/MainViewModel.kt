@@ -16,6 +16,7 @@ import me.yavuz.delta_a_project.model.Department
 import me.yavuz.delta_a_project.model.Group
 import me.yavuz.delta_a_project.model.Product
 import me.yavuz.delta_a_project.model.SellingProcess
+import me.yavuz.delta_a_project.model.SellingProcessType
 import me.yavuz.delta_a_project.model.Tax
 import me.yavuz.delta_a_project.model.User
 import me.yavuz.delta_a_project.model.UserType
@@ -161,5 +162,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             sellingProcessRepository.saveSellingProcess(sellingProcess)
         }
+    }
+
+    suspend fun getSellingTypeById(id: Int): SellingProcessType? {
+        return sellingProcessRepository.getSellingTypeById(id)
     }
 }

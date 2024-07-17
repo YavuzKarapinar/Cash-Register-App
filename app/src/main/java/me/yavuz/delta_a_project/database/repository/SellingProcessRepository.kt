@@ -6,6 +6,7 @@ import kotlinx.coroutines.withContext
 import me.yavuz.delta_a_project.database.DbHelper
 import me.yavuz.delta_a_project.database.dao.SellingProcessDAO
 import me.yavuz.delta_a_project.model.SellingProcess
+import me.yavuz.delta_a_project.model.SellingProcessType
 
 class SellingProcessRepository(context: Context) {
     private val dbHelper = DbHelper.getInstance(context)
@@ -23,4 +24,9 @@ class SellingProcessRepository(context: Context) {
         }
     }
 
+    suspend fun getSellingTypeById(id: Int): SellingProcessType? {
+        return withContext(Dispatchers.IO) {
+            sellingProcessDAO.getSellingTypeById(id)
+        }
+    }
 }
