@@ -139,11 +139,12 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun clearViews() { // todo: when clearing views its not rearranging stocks
+    private fun clearViews() {
         cartItems.clear()
         cartAdapter.notifyDataSetChanged()
         binding.mainTotalPrice.text = "Total: 0.00"
         binding.showNumbers.text = "0.00"
+        observeProduct()
         builder.clear()
     }
 
@@ -194,7 +195,7 @@ class MainFragment : Fragment() {
         binding.button9.setOnClickListener { appendToBuilder("9") }
         binding.button00.setOnClickListener { appendToBuilder("00") }
         binding.buttonC.setOnClickListener {
-            builder.clear() // todo: add clear views for this segment
+            clearViews()
             updateTextView()
         }
     }
