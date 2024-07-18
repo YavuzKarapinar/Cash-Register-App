@@ -5,12 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.davidmiguel.numberkeyboard.NumberKeyboardListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -60,27 +62,31 @@ class MainFragment : Fragment() {
     }
 
     private fun onPaymentClick() {
-        binding.paymentButton.setOnClickListener {
-            if (cartItems.isNotEmpty()) {
-                sharedViewModel.data.observe(viewLifecycleOwner) { userId ->
-                    lifecycleScope.launch {
-                        receiptShow()
-                        cartForEachItem(userId)
-                        clearViews()
-                    }
+        binding.cashPaymentButton.setOnClickListener { paymentType(1) }
+        binding.cardPaymentButton.setOnClickListener { paymentType(2) }
+        binding.otherPaymentButton.setOnClickListener { paymentType(3) }
+    }
+
+    private fun paymentType(type: Int = 1) {
+        if (cartItems.isNotEmpty()) {
+            sharedViewModel.data.observe(viewLifecycleOwner) { userId ->
+                lifecycleScope.launch {
+                    receiptShow(type)
+                    cartForEachItem(userId, type)
+                    clearViews()
                 }
             }
         }
     }
 
-    private fun receiptShow() {
+    private fun receiptShow(type: Int) {
         val builder = AlertDialog.Builder(binding.root.context)
         builder.setTitle("Payment Successful")
 
         val alertBinding = receiptDialogBinding()
 
         setReceiptDateAndClock(alertBinding)
-        setReceiptTotalPrices(alertBinding)
+        setReceiptTotalPrices(alertBinding, type)
 
         builder.setView(alertBinding.root)
         builder.setPositiveButton("OK") { dialog, _ ->
@@ -89,13 +95,13 @@ class MainFragment : Fragment() {
         builder.show()
     }
 
-    private fun setReceiptTotalPrices(alertBinding: ReceiptDialogBinding) {
+    private fun setReceiptTotalPrices(alertBinding: ReceiptDialogBinding, type: Int) {
         val totalPrice = cartItems.sumOf { it.first.price * it.second }
         val totalPriceFormatted = String.format(Locale.getDefault(), "%.1f", totalPrice)
         alertBinding.totalSellingPrice.text = totalPriceFormatted
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                val sellingType = viewModel.getSellingTypeById(1)
+                val sellingType = viewModel.getSellingTypeById(type)
                 alertBinding.sellingType.text = sellingType?.name ?: "Other"
             }
         }
@@ -118,7 +124,7 @@ class MainFragment : Fragment() {
         return alertBinding
     }
 
-    private suspend fun cartForEachItem(userId: Int) {
+    private suspend fun cartForEachItem(userId: Int, sellingType: Int) {
         cartItems.forEach { item ->
             val tax =
                 withContext(Dispatchers.IO) { viewModel.getTaxById(item.first.taxId) }
@@ -128,7 +134,7 @@ class MainFragment : Fragment() {
                 quantity = item.second,
                 priceSell = String.format(Locale.getDefault(), "%.1f", priceSell).toDouble(),
                 userId = userId,
-                sellingProcessTypeId = 1,
+                sellingProcessTypeId = sellingType,
                 productId = item.first.id
             )
             val product = viewModel.getProductById(item.first.id)
@@ -139,11 +145,12 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun clearViews() { // todo: when clearing views its not rearranging stocks
+    private fun clearViews() {
         cartItems.clear()
         cartAdapter.notifyDataSetChanged()
         binding.mainTotalPrice.text = "Total: 0.00"
         binding.showNumbers.text = "0.00"
+        observeProduct()
         builder.clear()
     }
 
@@ -182,21 +189,26 @@ class MainFragment : Fragment() {
     }
 
     private fun buttonClickListeners() {
-        binding.button0.setOnClickListener { appendToBuilder("0") }
-        binding.button1.setOnClickListener { appendToBuilder("1") }
-        binding.button2.setOnClickListener { appendToBuilder("2") }
-        binding.button3.setOnClickListener { appendToBuilder("3") }
-        binding.button4.setOnClickListener { appendToBuilder("4") }
-        binding.button5.setOnClickListener { appendToBuilder("5") }
-        binding.button6.setOnClickListener { appendToBuilder("6") }
-        binding.button7.setOnClickListener { appendToBuilder("7") }
-        binding.button8.setOnClickListener { appendToBuilder("8") }
-        binding.button9.setOnClickListener { appendToBuilder("9") }
-        binding.button00.setOnClickListener { appendToBuilder("00") }
-        binding.buttonC.setOnClickListener {
-            builder.clear() // todo: add clear views for this segment
-            updateTextView()
-        }
+        binding.numberKeyboard.setListener(object : NumberKeyboardListener {
+            override fun onNumberClicked(number: Int) {
+                appendToBuilder(number.toString())
+            }
+
+            override fun onLeftAuxButtonClicked() {
+                Toast.makeText(
+                    binding.root.context,
+                    "Multiply",
+                    Toast.LENGTH_SHORT
+                ).show() // todo add multiply with plu
+            }
+
+            override fun onRightAuxButtonClicked() {
+                if (builder.isNotEmpty()) {
+                    builder.deleteCharAt(builder.length - 1)
+                    updateTextView()
+                }
+            }
+        })
     }
 
     private fun appendToBuilder(text: String) {
