@@ -62,27 +62,31 @@ class MainFragment : Fragment() {
     }
 
     private fun onPaymentClick() {
-        binding.paymentButton.setOnClickListener {
-            if (cartItems.isNotEmpty()) {
-                sharedViewModel.data.observe(viewLifecycleOwner) { userId ->
-                    lifecycleScope.launch {
-                        receiptShow()
-                        cartForEachItem(userId)
-                        clearViews()
-                    }
+        binding.cashPaymentButton.setOnClickListener { paymentType(1) }
+        binding.cardPaymentButton.setOnClickListener { paymentType(2) }
+        binding.otherPaymentButton.setOnClickListener { paymentType(3) }
+    }
+
+    private fun paymentType(type: Int = 1) {
+        if (cartItems.isNotEmpty()) {
+            sharedViewModel.data.observe(viewLifecycleOwner) { userId ->
+                lifecycleScope.launch {
+                    receiptShow(type)
+                    cartForEachItem(userId, type)
+                    clearViews()
                 }
             }
         }
     }
 
-    private fun receiptShow() {
+    private fun receiptShow(type: Int) {
         val builder = AlertDialog.Builder(binding.root.context)
         builder.setTitle("Payment Successful")
 
         val alertBinding = receiptDialogBinding()
 
         setReceiptDateAndClock(alertBinding)
-        setReceiptTotalPrices(alertBinding)
+        setReceiptTotalPrices(alertBinding, type)
 
         builder.setView(alertBinding.root)
         builder.setPositiveButton("OK") { dialog, _ ->
@@ -91,13 +95,13 @@ class MainFragment : Fragment() {
         builder.show()
     }
 
-    private fun setReceiptTotalPrices(alertBinding: ReceiptDialogBinding) {
+    private fun setReceiptTotalPrices(alertBinding: ReceiptDialogBinding, type: Int) {
         val totalPrice = cartItems.sumOf { it.first.price * it.second }
         val totalPriceFormatted = String.format(Locale.getDefault(), "%.1f", totalPrice)
         alertBinding.totalSellingPrice.text = totalPriceFormatted
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                val sellingType = viewModel.getSellingTypeById(1)
+                val sellingType = viewModel.getSellingTypeById(type)
                 alertBinding.sellingType.text = sellingType?.name ?: "Other"
             }
         }
@@ -120,7 +124,7 @@ class MainFragment : Fragment() {
         return alertBinding
     }
 
-    private suspend fun cartForEachItem(userId: Int) {
+    private suspend fun cartForEachItem(userId: Int, sellingType: Int) {
         cartItems.forEach { item ->
             val tax =
                 withContext(Dispatchers.IO) { viewModel.getTaxById(item.first.taxId) }
@@ -130,7 +134,7 @@ class MainFragment : Fragment() {
                 quantity = item.second,
                 priceSell = String.format(Locale.getDefault(), "%.1f", priceSell).toDouble(),
                 userId = userId,
-                sellingProcessTypeId = 1,
+                sellingProcessTypeId = sellingType,
                 productId = item.first.id
             )
             val product = viewModel.getProductById(item.first.id)
