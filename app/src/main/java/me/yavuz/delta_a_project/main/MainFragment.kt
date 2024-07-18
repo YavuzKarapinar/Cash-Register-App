@@ -5,12 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.davidmiguel.numberkeyboard.NumberKeyboardListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -183,21 +185,26 @@ class MainFragment : Fragment() {
     }
 
     private fun buttonClickListeners() {
-        binding.button0.setOnClickListener { appendToBuilder("0") }
-        binding.button1.setOnClickListener { appendToBuilder("1") }
-        binding.button2.setOnClickListener { appendToBuilder("2") }
-        binding.button3.setOnClickListener { appendToBuilder("3") }
-        binding.button4.setOnClickListener { appendToBuilder("4") }
-        binding.button5.setOnClickListener { appendToBuilder("5") }
-        binding.button6.setOnClickListener { appendToBuilder("6") }
-        binding.button7.setOnClickListener { appendToBuilder("7") }
-        binding.button8.setOnClickListener { appendToBuilder("8") }
-        binding.button9.setOnClickListener { appendToBuilder("9") }
-        binding.button00.setOnClickListener { appendToBuilder("00") }
-        binding.buttonC.setOnClickListener {
-            clearViews()
-            updateTextView()
-        }
+        binding.numberKeyboard.setListener(object : NumberKeyboardListener {
+            override fun onNumberClicked(number: Int) {
+                appendToBuilder(number.toString())
+            }
+
+            override fun onLeftAuxButtonClicked() {
+                Toast.makeText(
+                    binding.root.context,
+                    "Multiply",
+                    Toast.LENGTH_SHORT
+                ).show() // todo add multiply with plu
+            }
+
+            override fun onRightAuxButtonClicked() {
+                if (builder.isNotEmpty()) {
+                    builder.deleteCharAt(builder.length - 1)
+                    updateTextView()
+                }
+            }
+        })
     }
 
     private fun appendToBuilder(text: String) {

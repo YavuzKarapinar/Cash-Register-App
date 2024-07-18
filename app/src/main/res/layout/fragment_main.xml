@@ -7,184 +7,27 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".main.MainFragment">
 
-    <GridLayout
-        android:id="@+id/gridLayout"
+    <com.davidmiguel.numberkeyboard.NumberKeyboard
+        android:id="@+id/numberKeyboard"
         android:layout_width="400dp"
         android:layout_height="350dp"
         android:layout_marginStart="250dp"
         android:background="@drawable/borders"
-        android:columnCount="4"
-        android:orientation="horizontal"
+        app:layout_constraintVertical_bias="1.0"
+        app:numberkeyboard_keyPadding="8dp"
+        app:numberkeyboard_keyWidth="120dp"
+        app:numberkeyboard_keyboardType="custom"
+        app:numberkeyboard_leftAuxBtnBackground="@drawable/borders"
+        app:numberkeyboard_leftAuxBtnIcon="@drawable/baseline_1x_mobiledata_24"
+        app:numberkeyboard_numberKeyBackground="@drawable/borders"
         android:padding="8dp"
-        android:rowCount="4"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0">
-
-        <Button
-            android:id="@+id/button_7"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_rowWeight="1"
-            android:layout_columnWeight="1"
-            android:backgroundTint="@color/numberBackground"
-            android:text="7"
-            android:textSize="18sp" />
-
-        <Button
-            android:id="@+id/button_8"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_rowWeight="1"
-            android:layout_columnWeight="1"
-            android:backgroundTint="@color/numberBackground"
-            android:text="8"
-            android:textSize="18sp" />
-
-        <Button
-            android:id="@+id/button_9"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_rowWeight="1"
-            android:layout_columnWeight="1"
-            android:backgroundTint="@color/numberBackground"
-            android:text="9"
-            android:textSize="18sp" />
-
-        <Button
-            android:id="@+id/button_plu"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_rowWeight="1"
-            android:layout_columnWeight="1"
-            android:backgroundTint="@color/pluBackground"
-            android:text="PLU"
-            android:textSize="18sp" />
-
-        <Button
-            android:id="@+id/button_4"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_rowWeight="1"
-            android:layout_columnWeight="1"
-            android:backgroundTint="@color/numberBackground"
-            android:text="4"
-            android:textSize="18sp" />
-
-        <Button
-            android:id="@+id/button_5"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_rowWeight="1"
-            android:layout_columnWeight="1"
-            android:backgroundTint="@color/numberBackground"
-            android:text="5"
-            android:textSize="18sp" />
-
-        <Button
-            android:id="@+id/button_6"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_rowWeight="1"
-            android:layout_columnWeight="1"
-            android:backgroundTint="@color/numberBackground"
-            android:text="6"
-            android:textSize="18sp" />
-
-        <Button
-            android:id="@+id/button_disc"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_rowWeight="1"
-            android:layout_columnWeight="1"
-            android:backgroundTint="@color/discBackground"
-            android:text="DISC"
-            android:textSize="18sp" />
-
-        <Button
-            android:id="@+id/button_1"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_rowWeight="1"
-            android:layout_columnWeight="1"
-            android:backgroundTint="@color/numberBackground"
-            android:text="1"
-            android:textSize="18sp" />
-
-        <Button
-            android:id="@+id/button_2"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_rowWeight="1"
-            android:layout_columnWeight="1"
-            android:backgroundTint="@color/numberBackground"
-            android:text="2"
-            android:textSize="18sp" />
-
-        <Button
-            android:id="@+id/button_3"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_rowWeight="1"
-            android:layout_columnWeight="1"
-            android:backgroundTint="@color/numberBackground"
-            android:text="3"
-            android:textSize="18sp" />
-
-        <Button
-            android:id="@+id/button_times"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_rowWeight="1"
-            android:layout_columnWeight="1"
-            android:backgroundTint="@color/numberBackground"
-            android:text="x/%"
-            android:textSize="18sp" />
-
-        <Button
-            android:id="@+id/button_0"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_rowWeight="1"
-            android:layout_columnWeight="1"
-            android:backgroundTint="@color/numberBackground"
-            android:text="0"
-            android:textSize="18sp" />
-
-        <Button
-            android:id="@+id/button_00"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_rowWeight="1"
-            android:layout_columnWeight="1"
-            android:backgroundTint="@color/numberBackground"
-            android:text="00"
-            android:textSize="18sp" />
-
-        <Button
-            android:id="@+id/button_dot"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_rowWeight="1"
-            android:layout_columnWeight="1"
-            android:backgroundTint="@color/numberBackground"
-            android:text="."
-            android:textSize="18sp" />
-
-        <Button
-            android:id="@+id/button_c"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_rowWeight="1"
-            android:layout_columnWeight="1"
-            android:backgroundTint="@color/clearBackground"
-            android:text="C"
-            android:textSize="18sp" />
-
-    </GridLayout>
+        app:numberkeyboard_rightAuxBtnBackground="@drawable/borders"
+        app:numberkeyboard_rightAuxBtnIcon="@drawable/baseline_delete_24" />
 
     <TextView
         android:id="@+id/showNumbers"
@@ -197,7 +40,7 @@
         android:text="0.00"
         android:textAlignment="textEnd"
         android:textSize="32sp"
-        app:layout_constraintBottom_toTopOf="@+id/gridLayout"
+        app:layout_constraintBottom_toTopOf="@+id/numberKeyboard"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -230,7 +73,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/gridLayout"
+        app:layout_constraintStart_toEndOf="@+id/numberKeyboard"
         app:layout_constraintTop_toBottomOf="@+id/mainItemSearch" />
 
     <androidx.cardview.widget.CardView
@@ -239,7 +82,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         app:cardBackgroundColor="@color/lightPurple"
-        app:layout_constraintEnd_toStartOf="@+id/gridLayout"
+        app:layout_constraintEnd_toStartOf="@+id/numberKeyboard"
         app:layout_constraintStart_toStartOf="parent"
         tools:layout_editor_absoluteY="16dp">
 

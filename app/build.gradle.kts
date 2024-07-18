@@ -40,6 +40,7 @@ android {
 }
 
 dependencies {
+    implementation("com.github.davidmigloz:number-keyboard:3.1.0")
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.core.ktx)
