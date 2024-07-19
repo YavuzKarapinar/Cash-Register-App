@@ -5,6 +5,7 @@ data class SellingProcess(
     val quantity: Int,
     val priceSell: Double,
     val amount: Double = quantity * priceSell,
+    val sellingFormat: String,
     val userId: Int,
     val sellingProcessTypeId: Int,
     val productId: Int

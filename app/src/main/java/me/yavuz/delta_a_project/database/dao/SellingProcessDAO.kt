@@ -9,7 +9,7 @@ class SellingProcessDAO(private val db: SQLiteDatabase) {
 
     fun getSellingProcessById(id: Int): SellingProcess? {
         val sql =
-            "SELECT id, quantity, price_sell, amount, user_id, selling_process_type_id, product_id " +
+            "SELECT id, quantity, price_sell, amount, selling_format, user_id, selling_process_type_id, product_id " +
                     "FROM selling_process " +
                     "WHERE id = ?"
 
@@ -20,9 +20,10 @@ class SellingProcessDAO(private val db: SQLiteDatabase) {
                     it.getInt(1),
                     it.getDouble(2),
                     it.getDouble(3),
-                    it.getInt(4),
+                    it.getString(4),
                     it.getInt(5),
-                    it.getInt(6)
+                    it.getInt(6),
+                    it.getInt(7)
                 )
             }
         }
@@ -35,6 +36,7 @@ class SellingProcessDAO(private val db: SQLiteDatabase) {
             put("quantity", sellingProcess.quantity)
             put("price_sell", sellingProcess.priceSell)
             put("amount", sellingProcess.amount)
+            put("selling_format", sellingProcess.sellingFormat)
             put("user_id", sellingProcess.userId)
             put("selling_process_type_id", sellingProcess.sellingProcessTypeId)
             put("product_id", sellingProcess.productId)

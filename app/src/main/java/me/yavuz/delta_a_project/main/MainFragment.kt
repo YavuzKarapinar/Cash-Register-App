@@ -65,6 +65,13 @@ class MainFragment : Fragment() {
         binding.cashPaymentButton.setOnClickListener { paymentType(1) }
         binding.cardPaymentButton.setOnClickListener { paymentType(2) }
         binding.otherPaymentButton.setOnClickListener { paymentType(3) }
+        binding.returnButton.setOnClickListener {
+            cartItems.forEachIndexed { index, pair ->
+                cartItems[index] = Pair(pair.first, -pair.second)
+            }
+            cartAdapter.notifyDataSetChanged()
+            updateTotalPrice()
+        }
     }
 
     private fun paymentType(type: Int = 1) {
@@ -124,25 +131,43 @@ class MainFragment : Fragment() {
         return alertBinding
     }
 
-    private suspend fun cartForEachItem(userId: Int, sellingType: Int) {
+    private suspend fun cartForEachItem(
+        userId: Int,
+        sellingType: Int,
+    ) {
         cartItems.forEach { item ->
-            val tax =
-                withContext(Dispatchers.IO) { viewModel.getTaxById(item.first.taxId) }
-            val priceSell = (item.first.price) / ((tax!!.value / 100) + 1)
-            val sellingProcess = SellingProcess(
-                id = 0,
-                quantity = item.second,
-                priceSell = String.format(Locale.getDefault(), "%.1f", priceSell).toDouble(),
-                userId = userId,
-                sellingProcessTypeId = sellingType,
-                productId = item.first.id
-            )
-            val product = viewModel.getProductById(item.first.id)
-            product!!.stock -= item.second
-
-            viewModel.updateProduct(product!!)
-            viewModel.saveSellingProcess(sellingProcess)
+            if (item.second > 0) {
+                sellingProcessForSaleFormat(item, "SALE", userId, sellingType)
+            } else {
+                sellingProcessForSaleFormat(item, "RETURN", userId, sellingType)
+            }
         }
+    }
+
+    private suspend fun sellingProcessForSaleFormat(
+        item: Pair<Product, Int>,
+        sellingFormat: String,
+        userId: Int,
+        sellingType: Int
+    ) {
+        val tax =
+            withContext(Dispatchers.IO) { viewModel.getTaxById(item.first.taxId) }
+        val priceSell = (item.first.price) / ((tax!!.value / 100) + 1)
+
+        val sellingProcess = SellingProcess(
+            id = 0,
+            quantity = item.second,
+            priceSell = String.format(Locale.getDefault(), "%.1f", priceSell).toDouble(),
+            sellingFormat = sellingFormat,
+            userId = userId,
+            sellingProcessTypeId = sellingType,
+            productId = item.first.id
+        )
+        val product = viewModel.getProductById(item.first.id)
+        product!!.stock -= item.second
+
+        viewModel.updateProduct(product!!)
+        viewModel.saveSellingProcess(sellingProcess)
     }
 
     private fun clearViews() {
@@ -228,6 +253,10 @@ class MainFragment : Fragment() {
 
     private fun addToCart(product: Product) {
         cartAdapter.updateItem(product)
+        updateTotalPrice()
+    }
+
+    private fun updateTotalPrice() {
         val totalPrice = cartItems.sumOf { it.first.price * it.second }
         val totalPriceFormatted = String.format(Locale.getDefault(), "%.1f", totalPrice)
         binding.mainTotalPrice.text = "Total: $totalPriceFormatted"
