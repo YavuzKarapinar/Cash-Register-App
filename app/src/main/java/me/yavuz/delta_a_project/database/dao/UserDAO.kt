@@ -19,6 +19,20 @@ class UserDAO(private val db: SQLiteDatabase) {
         return null
     }
 
+    fun getUserById(id: Int): User? {
+        val sql =
+            "SELECT id, name, password, user_type_id FROM users WHERE id=?"
+
+        db.rawQuery(sql, arrayOf(id.toString())).use {
+            if (it.moveToFirst()) {
+                val userType = getUserTypeById(it.getInt(3))
+                return User(it.getInt(0), it.getString(1), it.getString(2), userType!!.name)
+            }
+        }
+
+        return null
+    }
+
     fun saveUser(userTypeName: String, name: String, password: String) {
         val userType = getUserTypeByName(userTypeName)
         val values = ContentValues().apply {

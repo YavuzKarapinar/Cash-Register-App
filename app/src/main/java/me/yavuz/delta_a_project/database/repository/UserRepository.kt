@@ -17,6 +17,11 @@ class UserRepository(context: Context) {
             userDAO.getUserByNameAndPassword(name, password)
         }
     }
+    suspend fun getUserById(id: Int): User? {
+        return withContext(Dispatchers.IO) {
+            userDAO.getUserById(id)
+        }
+    }
 
     suspend fun saveUser(userTypeName: String, name: String, password: String) {
         withContext(Dispatchers.IO) {

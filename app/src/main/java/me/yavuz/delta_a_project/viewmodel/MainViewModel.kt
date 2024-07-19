@@ -39,6 +39,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return userLiveData
     }
 
+    suspend fun getUserById(id: Int): User? {
+        return userRepository.getUserById(id)
+    }
+
     fun saveUser(userTypeName: String, name: String, password: String) {
         viewModelScope.launch {
             userRepository.saveUser(userTypeName, name, password)
