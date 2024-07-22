@@ -31,7 +31,7 @@ class SellingProcessDAO(private val db: SQLiteDatabase) {
         return null
     }
 
-    fun saveSellingProcess(sellingProcess: SellingProcess) {
+    fun saveSellingProcess(sellingProcess: SellingProcess): Long {
         val values = ContentValues().apply {
             put("quantity", sellingProcess.quantity)
             put("price_sell", sellingProcess.priceSell)
@@ -42,7 +42,7 @@ class SellingProcessDAO(private val db: SQLiteDatabase) {
             put("product_id", sellingProcess.productId)
         }
 
-        db.insert("selling_process", null, values)
+        return db.insert("selling_process", null, values)
     }
 
     fun getSellingTypeById(id: Int): SellingProcessType? {

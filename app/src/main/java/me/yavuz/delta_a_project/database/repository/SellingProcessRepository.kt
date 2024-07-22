@@ -18,8 +18,8 @@ class SellingProcessRepository(context: Context) {
         }
     }
 
-    suspend fun saveSellingProcess(sellingProcess: SellingProcess) {
-        withContext(Dispatchers.IO) {
+    suspend fun saveSellingProcess(sellingProcess: SellingProcess): Long {
+        return withContext(Dispatchers.IO) {
             sellingProcessDAO.saveSellingProcess(sellingProcess)
         }
     }

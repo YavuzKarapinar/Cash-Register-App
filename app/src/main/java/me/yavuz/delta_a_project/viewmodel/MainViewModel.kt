@@ -162,10 +162,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return sellingProcessRepository.getSellingProcessById(id)
     }
 
-    fun saveSellingProcess(sellingProcess: SellingProcess) {
-        viewModelScope.launch {
-            sellingProcessRepository.saveSellingProcess(sellingProcess)
-        }
+    suspend fun saveSellingProcess(sellingProcess: SellingProcess): Long {
+        return sellingProcessRepository.saveSellingProcess(sellingProcess)
     }
 
     suspend fun getSellingTypeById(id: Int): SellingProcessType? {
