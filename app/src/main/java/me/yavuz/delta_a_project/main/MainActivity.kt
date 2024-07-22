@@ -39,6 +39,33 @@ class MainActivity : AppCompatActivity() {
             supportFragmentManager.findFragmentById(R.id.mainFrame) as NavHostFragment
         navController = navHostFragment.navController
         binding.bottomNavigationView.setupWithNavController(navController)
+        fragmentNavigation()
+    }
+
+    private fun fragmentNavigation() {
+        binding.bottomNavigationView.setOnItemSelectedListener {
+            when (it.itemId) {
+                R.id.mainFragment -> {
+                    navController.navigate(R.id.mainFragment)
+                    true
+                }
+
+                R.id.settingsFragment -> {
+                    navController.navigate(R.id.settingsFragment)
+                    true
+                }
+
+                R.id.loginActivity -> {
+                    navController.navigate(R.id.loginActivity)
+                    finish()
+                    true
+                }
+
+                else -> {
+                    false
+                }
+            }
+        }
     }
 
     private fun getDataFromLogin(): Int {
