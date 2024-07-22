@@ -41,9 +41,6 @@ class MainFragment : Fragment() {
     private val cartItems: MutableList<Pair<Product, Int>> = mutableListOf()
     private lateinit var cartAdapter: CartAdapter
     private val sharedViewModel by activityViewModels<SharedViewModel>()
-    private val totalInfoBuilder = StringBuilder()
-    private val totalPaymentBuilder = StringBuilder()
-    private lateinit var alertBinding: ReceiptDialogBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -61,7 +58,6 @@ class MainFragment : Fragment() {
         cartRecyclerInitialize()
         itemRecyclerInitialize()
         observeProduct()
-        receiptDialogBinding()
         onPaymentClick()
     }
 
@@ -82,20 +78,22 @@ class MainFragment : Fragment() {
         if (cartItems.isNotEmpty()) {
             sharedViewModel.data.observe(viewLifecycleOwner) { userId ->
                 lifecycleScope.launch {
-                    val totalTax = cartForEachItem(userId, type)
-                    receiptShow(type, totalTax)
+                    receiptShow(type)
+                    cartForEachItem(userId, type)
                     clearViews()
                 }
             }
         }
     }
 
-    private suspend fun receiptShow(type: Int, totalTax: Double) {
+    private fun receiptShow(type: Int) {
         val builder = AlertDialog.Builder(binding.root.context)
         builder.setTitle("Payment Successful")
 
-        setReceiptDateAndClock()
-        setReceiptTotalPrices(type, totalTax)
+        val alertBinding = receiptDialogBinding()
+
+        setReceiptDateAndClock(alertBinding)
+        setReceiptTotalPrices(alertBinding, type)
 
         builder.setView(alertBinding.root)
         builder.setPositiveButton("OK") { dialog, _ ->
@@ -104,23 +102,10 @@ class MainFragment : Fragment() {
         builder.show()
     }
 
-    private suspend fun setReceiptTotalPrices(type: Int, totalTax: Double) {
+    private fun setReceiptTotalPrices(alertBinding: ReceiptDialogBinding, type: Int) {
         val totalPrice = cartItems.sumOf { it.first.price * it.second }
         val totalPriceFormatted = String.format(Locale.getDefault(), "%.1f", totalPrice)
         alertBinding.totalSellingPrice.text = totalPriceFormatted
-        alertBinding.totalPriceProcessRow.text = totalPriceFormatted
-        val totalTaxFormatted = String.format(Locale.getDefault(), "%.1f", totalTax)
-
-        totalInfoBuilder.append("\nPayed \n")
-        totalPaymentBuilder.append("\n" + totalPriceFormatted + "\n")
-        totalInfoBuilder.append("Total Tax \n")
-        totalPaymentBuilder.append(totalTaxFormatted + "\n")
-        totalInfoBuilder.append("Net \n")
-        totalPaymentBuilder.append((totalPrice - totalTax).toString() + "\n")
-
-        alertBinding.paymentInformation.text = totalInfoBuilder.toString()
-        alertBinding.paymentInformationPrice.text = totalPaymentBuilder.toString()
-
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
                 val sellingType = viewModel.getSellingTypeById(type)
@@ -129,52 +114,34 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun setReceiptDateAndClock() {
+    private fun setReceiptDateAndClock(alertBinding: ReceiptDialogBinding) {
         val date = Date(System.currentTimeMillis())
         alertBinding.date.text = SimpleDateFormat.getDateInstance().format(date)
         alertBinding.clock.text = SimpleDateFormat.getTimeInstance().format(date)
     }
 
-    private fun receiptDialogBinding() {
+    private fun receiptDialogBinding(): ReceiptDialogBinding {
         val customLayout =
             layoutInflater.inflate(R.layout.receipt_dialog, binding.root, false)
-        alertBinding = ReceiptDialogBinding.bind(customLayout)
+        val alertBinding = ReceiptDialogBinding.bind(customLayout)
         alertBinding.cartItemsRecycler.apply {
             adapter = ReceiptItemAdapter(cartItems)
             layoutManager = LinearLayoutManager(alertBinding.root.context)
         }
-
+        return alertBinding
     }
 
     private suspend fun cartForEachItem(
         userId: Int,
         sellingType: Int,
-    ): Double {
-        var totalTax = 0.0
-
-        for (item in cartItems) {
-            val lastId = if (item.second > 0) {
+    ) {
+        cartItems.forEach { item ->
+            if (item.second > 0) {
                 sellingProcessForSaleFormat(item, "SALE", userId, sellingType)
             } else {
                 sellingProcessForSaleFormat(item, "RETURN", userId, sellingType)
             }
-            val sellingProcess = viewModel.getSellingProcessById(lastId.toInt())
-            val product = sellingProcess?.productId?.let { viewModel.getProductById(it) }
-            val tax = product?.taxId?.let { viewModel.getTaxById(it) }
-            val taxPrice = String.format(
-                Locale.getDefault(),
-                "%.1f",
-                product?.price?.minus(sellingProcess.priceSell)
-            )
-            totalInfoBuilder.append("Tax ${tax?.name} \n")
-            totalPaymentBuilder.append(taxPrice + "\n")
-            totalTax += sellingProcess?.priceSell?.let { product?.price?.minus(it) } ?: 0.0
         }
-
-        alertBinding.paymentInformation.text = totalInfoBuilder.toString()
-        alertBinding.paymentInformationPrice.text = totalPaymentBuilder.toString()
-
-        return totalTax
     }
 
     private suspend fun sellingProcessForSaleFormat(
@@ -182,8 +149,9 @@ class MainFragment : Fragment() {
         sellingFormat: String,
         userId: Int,
         sellingType: Int
-    ): Long {
-        val tax = withContext(Dispatchers.IO) { viewModel.getTaxById(item.first.taxId) }
+    ) {
+        val tax =
+            withContext(Dispatchers.IO) { viewModel.getTaxById(item.first.taxId) }
         val priceSell = (item.first.price) / ((tax!!.value / 100) + 1)
 
         val sellingProcess = SellingProcess(
@@ -198,17 +166,9 @@ class MainFragment : Fragment() {
         val product = viewModel.getProductById(item.first.id)
         product!!.stock -= item.second
 
-        withContext(Dispatchers.IO) {
-            if (product != null) {
-                viewModel.updateProduct(product)
-            }
-        }
-
-        return withContext(Dispatchers.IO) {
-            viewModel.saveSellingProcess(sellingProcess)
-        }
+        viewModel.updateProduct(product!!)
+        viewModel.saveSellingProcess(sellingProcess)
     }
-
 
     private fun clearViews() {
         cartItems.clear()
