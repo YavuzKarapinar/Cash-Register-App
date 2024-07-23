@@ -53,44 +53,50 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         decimalFormat = DecimalFormat("#,###.##")
-        searchFilterListener()
-        buttonClickListeners()
-        cartRecyclerInitialize()
-        itemRecyclerInitialize()
+        setupUI()
         observeProduct()
-        onPaymentClick()
     }
 
-    private fun onPaymentClick() {
-        binding.cashPaymentButton.setOnClickListener { paymentType(1) }
-        binding.cardPaymentButton.setOnClickListener { paymentType(2) }
-        binding.otherPaymentButton.setOnClickListener { paymentType(3) }
-        binding.returnButton.setOnClickListener {
-            cartItems.forEachIndexed { index, pair ->
-                cartItems[index] = Pair(pair.first, -pair.second)
-            }
-            cartAdapter.notifyDataSetChanged()
-            updateTotalPrice()
+    private fun setupUI() {
+        setupSearchFilter()
+        setupButtonClickListeners()
+        setupCartRecycler()
+        setupItemRecycler()
+        setupPaymentButtons()
+    }
+
+    private fun setupPaymentButtons() {
+        binding.cashPaymentButton.setOnClickListener { processPayment(1) }
+        binding.cardPaymentButton.setOnClickListener { processPayment(2) }
+        binding.otherPaymentButton.setOnClickListener { processPayment(3) }
+        binding.returnButton.setOnClickListener { processReturn() }
+    }
+
+    private fun processReturn() {
+        cartItems.forEachIndexed { index, pair ->
+            cartItems[index] = Pair(pair.first, -pair.second)
         }
+        cartAdapter.notifyDataSetChanged()
+        updateTotalPrice()
     }
 
-    private fun paymentType(type: Int = 1) {
+    private fun processPayment(type: Int) {
         if (cartItems.isNotEmpty()) {
             sharedViewModel.data.observe(viewLifecycleOwner) { userId ->
                 lifecycleScope.launch {
-                    receiptShow(type)
-                    cartForEachItem(userId, type)
+                    showReceipt(type)
+                    processCartItems(userId, type)
                     clearViews()
                 }
             }
         }
     }
 
-    private fun receiptShow(type: Int) {
+    private fun showReceipt(type: Int) {
         val builder = AlertDialog.Builder(binding.root.context)
-        val alertBinding = receiptDialogBinding()
+        val alertBinding = inflateReceiptDialog()
 
-        setReceiptDateAndClock(alertBinding)
+        setReceiptDateAndTime(alertBinding)
         setReceiptTotalPrices(alertBinding, type)
 
         builder.setView(alertBinding.root)
@@ -102,69 +108,73 @@ class MainFragment : Fragment() {
 
     private fun setReceiptTotalPrices(alertBinding: ReceiptDialogBinding, type: Int) {
         lifecycleScope.launch {
-            var totalTax = 0.0
-            val totalPrice = cartItems.sumOf { it.first.price * it.second }
+            val totalTax = calculateTotalTax()
+            val totalPrice = calculateTotalPrice()
+            val netPrice = totalPrice - totalTax
             val paymentInfoBuilder = StringBuilder()
             val paymentPriceBuilder = StringBuilder()
-            val taxListInfoBuilder = StringBuilder()
-            val taxListPriceBuilder = StringBuilder()
-            val taxPriceMap = mutableMapOf<String, Double>()
-
-            cartAdapter.cartList.forEach {
-                val tax = viewModel.getTaxById(it.first.taxId)
-                val priceSellNet = priceSellNetCalculator(it.first.price, tax!!.value)
-                val taxPrice = it.first.price - priceSellNet
-
-                if (taxPriceMap.containsKey(tax.name)) {
-                    taxPriceMap[tax.name] = taxPriceMap[tax.name]!! + taxPrice
-                } else {
-                    taxListInfoBuilder.append("${tax.name} %${tax.value} \n")
-                    taxPriceMap[tax.name] = taxPrice
-                }
-
-                totalTax += taxPrice
-            }
-
-            taxPriceMap.forEach { (_, price) ->
-                taxListPriceBuilder.append("${formattingDoubleValues(price)} \n")
-            }
-            val netPrice = totalPrice - totalTax
+            val taxDetails = buildTaxDetails()
 
             paymentInfoBuilder.append("\nPayed \n")
-            paymentPriceBuilder.append("\n ${formattingDoubleValues(totalPrice)} \n")
-            paymentInfoBuilder.append("Total Tax \n")
-            paymentPriceBuilder.append("${formattingDoubleValues(totalTax)} \n")
-            paymentInfoBuilder.append("Net Price \n")
-            paymentPriceBuilder.append("${formattingDoubleValues(netPrice)} \n")
-            paymentInfoBuilder.append(taxListInfoBuilder)
-            paymentPriceBuilder.append(taxListPriceBuilder)
+                .append("Total Tax \n")
+                .append("Net Price \n")
+                .append(taxDetails.first)
 
-            alertBinding.paymentInformation.text = paymentInfoBuilder.toString()
-            alertBinding.paymentInformationPrice.text = paymentPriceBuilder.toString()
-            alertBinding.totalSellingPrice.text = formattingDoubleValues(totalPrice)
-            alertBinding.totalPriceProcessRow.text = formattingDoubleValues(totalPrice)
-            val sellingType = viewModel.getSellingTypeById(type)
-            alertBinding.sellingType.text = sellingType?.name ?: "Other"
+            paymentPriceBuilder.append("\n${formatDouble(totalPrice)}\n")
+                .append("${formatDouble(totalTax)}\n")
+                .append("${formatDouble(netPrice)}\n")
+                .append(taxDetails.second)
+
+            alertBinding.apply {
+                paymentInformation.text = paymentInfoBuilder.toString()
+                paymentInformationPrice.text = paymentPriceBuilder.toString()
+                totalSellingPrice.text = formatDouble(totalPrice)
+                totalPriceProcessRow.text = formatDouble(totalPrice)
+                sellingType.text = viewModel.getSellingTypeById(type)?.name ?: "Other"
+            }
         }
     }
 
-    private fun formattingDoubleValues(value: Double): String {
-        return String.format(Locale.getDefault(), "%.1f", value)
+    private suspend fun calculateTotalTax(): Double {
+        var totalTax = 0.0
+        cartAdapter.cartList.forEach {
+            val tax = viewModel.getTaxById(it.first.taxId)
+            val taxPrice = it.first.price - calculateNetPrice(it.first.price, tax!!.value)
+            totalTax += taxPrice
+        }
+        return totalTax
     }
 
-    private fun priceSellNetCalculator(grossPrice: Double, taxValue: Double): Double {
-        return grossPrice / ((taxValue / 100) + 1)
+    private suspend fun buildTaxDetails(): Pair<String, String> {
+        val taxInfoBuilder = StringBuilder()
+        val taxPriceBuilder = StringBuilder()
+        val taxPriceMap = mutableMapOf<String, Double>()
+
+        withContext(Dispatchers.IO) {
+            cartAdapter.cartList.forEach {
+                val tax = viewModel.getTaxById(it.first.taxId)
+                val taxPrice = it.first.price - calculateNetPrice(it.first.price, tax!!.value)
+
+                taxPriceMap[tax.name] = taxPriceMap.getOrDefault(tax.name, 0.0) + taxPrice
+            }
+
+            taxPriceMap.forEach { (name, price) ->
+                taxInfoBuilder.append("$name %${viewModel.getTaxByName(name)!!.value}\n")
+                taxPriceBuilder.append("${formatDouble(price)}\n")
+            }
+        }
+
+        return Pair(taxInfoBuilder.toString(), taxPriceBuilder.toString())
     }
 
-    private fun setReceiptDateAndClock(alertBinding: ReceiptDialogBinding) {
-        val date = Date(System.currentTimeMillis())
+    private fun setReceiptDateAndTime(alertBinding: ReceiptDialogBinding) {
+        val date = Date()
         alertBinding.date.text = SimpleDateFormat.getDateInstance().format(date)
         alertBinding.clock.text = SimpleDateFormat.getTimeInstance().format(date)
     }
 
-    private fun receiptDialogBinding(): ReceiptDialogBinding {
-        val customLayout =
-            layoutInflater.inflate(R.layout.receipt_dialog, binding.root, false)
+    private fun inflateReceiptDialog(): ReceiptDialogBinding {
+        val customLayout = layoutInflater.inflate(R.layout.receipt_dialog, binding.root, false)
         val alertBinding = ReceiptDialogBinding.bind(customLayout)
         alertBinding.cartItemsRecycler.apply {
             adapter = ReceiptItemAdapter(cartItems)
@@ -173,55 +183,67 @@ class MainFragment : Fragment() {
         return alertBinding
     }
 
-    private suspend fun cartForEachItem(
-        userId: Int,
-        sellingType: Int,
-    ) {
+    private fun calculateNetPrice(grossPrice: Double, taxValue: Double): Double {
+        return grossPrice / ((taxValue / 100) + 1)
+    }
+
+    private fun calculateTotalPrice(): Double {
+        return cartItems.sumOf { it.first.price * it.second }
+    }
+
+    private fun formatDouble(value: Double): String {
+        return String.format(Locale.getDefault(), "%.1f", value)
+    }
+
+    private suspend fun processCartItems(userId: Int, sellingType: Int) {
         cartItems.forEach { item ->
-            if (item.second > 0) {
-                sellingProcessForSaleFormat(item, "SALE", userId, sellingType)
-            } else {
-                sellingProcessForSaleFormat(item, "RETURN", userId, sellingType)
-            }
+            val sellingFormat = if (item.second > 0) "SALE" else "RETURN"
+            saveSellingProcess(item, sellingFormat, userId, sellingType)
         }
     }
 
-    private suspend fun sellingProcessForSaleFormat(
+    private suspend fun saveSellingProcess(
         item: Pair<Product, Int>,
         sellingFormat: String,
         userId: Int,
         sellingType: Int
     ) {
-        val tax =
-            withContext(Dispatchers.IO) { viewModel.getTaxById(item.first.taxId) }
-        val priceSell = (item.first.price) / ((tax!!.value / 100) + 1)
-
+        val tax = withContext(Dispatchers.IO) { viewModel.getTaxById(item.first.taxId) }
+        val netPrice = calculateNetPrice(item.first.price, tax!!.value)
         val sellingProcess = SellingProcess(
             id = 0,
             quantity = item.second,
-            priceSell = String.format(Locale.getDefault(), "%.1f", priceSell).toDouble(),
+            priceSell = formatDouble(netPrice).toDouble(),
             sellingFormat = sellingFormat,
             userId = userId,
             sellingProcessTypeId = sellingType,
             productId = item.first.id
         )
-        val product = viewModel.getProductById(item.first.id)
-        product!!.stock -= item.second
 
-        viewModel.updateProduct(product!!)
+        updateProductStock(item)
         viewModel.saveSellingProcess(sellingProcess)
+    }
+
+    private suspend fun updateProductStock(item: Pair<Product, Int>) {
+        val product = viewModel.getProductById(item.first.id)
+        product?.let {
+            it.stock -= item.second
+            viewModel.updateProduct(it)
+        }
     }
 
     private fun clearViews() {
         cartItems.clear()
         cartAdapter.notifyDataSetChanged()
-        binding.mainTotalPrice.text = "Total: 0.00"
-        binding.showNumbers.text = "0.00"
-        observeProduct()
+        binding.apply {
+            mainTotalPrice.text = "Total: 0.00"
+            showNumbers.text = "0.00"
+        }
         builder.clear()
+        observeProduct()
     }
 
-    private fun cartRecyclerInitialize() {
+    private fun setupCartRecycler() {
         cartAdapter = CartAdapter(cartItems)
         binding.cartRecyclerView.apply {
             adapter = cartAdapter
@@ -229,7 +251,7 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun itemRecyclerInitialize() {
+    private fun setupItemRecycler() {
         binding.itemRecyclerView.apply {
             layoutManager = LinearLayoutManager(binding.root.context)
             adapter = mainItemAdapter
@@ -242,12 +264,9 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun searchFilterListener() {
+    private fun setupSearchFilter() {
         binding.mainItemSearch.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                return false
-            }
-
+            override fun onQueryTextSubmit(query: String?): Boolean = false
             override fun onQueryTextChange(newText: String?): Boolean {
                 mainItemAdapter.filter.filter(newText)
                 return true
@@ -255,18 +274,15 @@ class MainFragment : Fragment() {
         })
     }
 
-    private fun buttonClickListeners() {
+    private fun setupButtonClickListeners() {
         binding.numberKeyboard.setListener(object : NumberKeyboardListener {
             override fun onNumberClicked(number: Int) {
                 appendToBuilder(number.toString())
             }
 
             override fun onLeftAuxButtonClicked() {
-                Toast.makeText(
-                    binding.root.context,
-                    "Multiply",
-                    Toast.LENGTH_SHORT
-                ).show() // todo add multiply with plu
+                Toast.makeText(binding.root.context, "Multiply", Toast.LENGTH_SHORT).show()
+                // TODO: Implement multiply with PLU
             }
 
             override fun onRightAuxButtonClicked() {
@@ -284,13 +300,8 @@ class MainFragment : Fragment() {
     }
 
     private fun updateTextView() {
-        val value = builder.takeIf { it.isNotEmpty() }.toString().toDoubleOrNull()?.div(100.0)
-
-        if (value != null) {
-            binding.showNumbers.text = decimalFormat.format(value)
-        } else {
-            binding.showNumbers.text = "0.00"
-        }
+        val value = builder.toString().toDoubleOrNull()?.div(100.0) ?: 0.00
+        binding.showNumbers.text = decimalFormat.format(value)
     }
 
     private fun addToCart(product: Product) {
@@ -299,8 +310,7 @@ class MainFragment : Fragment() {
     }
 
     private fun updateTotalPrice() {
-        val totalPrice = cartItems.sumOf { it.first.price * it.second }
-        val totalPriceFormatted = String.format(Locale.getDefault(), "%.1f", totalPrice)
-        binding.mainTotalPrice.text = "Total: $totalPriceFormatted"
+        val totalPrice = calculateTotalPrice()
+        binding.mainTotalPrice.text = "Total: ${formatDouble(totalPrice)}"
     }
 }
