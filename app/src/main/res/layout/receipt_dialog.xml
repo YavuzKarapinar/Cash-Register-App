@@ -9,6 +9,12 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:contentDescription="Delta A Logo"
+            android:src="@drawable/logod" />
+
         <TextView
             android:id="@+id/receiptArticleTopLine"
             android:layout_width="match_parent"

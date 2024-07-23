@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import me.yavuz.delta_a_project.databinding.FragmentMainCartItemBinding
 import me.yavuz.delta_a_project.model.Product
 
-class CartAdapter(private val cartList: MutableList<Pair<Product, Int>>) :
+class CartAdapter(val cartList: MutableList<Pair<Product, Int>>) :
     RecyclerView.Adapter<CartAdapter.CartViewHolder>() {
 
     inner class CartViewHolder(private val binding: FragmentMainCartItemBinding) :

@@ -88,8 +88,6 @@ class MainFragment : Fragment() {
 
     private fun receiptShow(type: Int) {
         val builder = AlertDialog.Builder(binding.root.context)
-        builder.setTitle("Payment Successful")
-
         val alertBinding = receiptDialogBinding()
 
         setReceiptDateAndClock(alertBinding)
@@ -103,15 +101,59 @@ class MainFragment : Fragment() {
     }
 
     private fun setReceiptTotalPrices(alertBinding: ReceiptDialogBinding, type: Int) {
-        val totalPrice = cartItems.sumOf { it.first.price * it.second }
-        val totalPriceFormatted = String.format(Locale.getDefault(), "%.1f", totalPrice)
-        alertBinding.totalSellingPrice.text = totalPriceFormatted
         lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                val sellingType = viewModel.getSellingTypeById(type)
-                alertBinding.sellingType.text = sellingType?.name ?: "Other"
+            var totalTax = 0.0
+            val totalPrice = cartItems.sumOf { it.first.price * it.second }
+            val paymentInfoBuilder = StringBuilder()
+            val paymentPriceBuilder = StringBuilder()
+            val taxListInfoBuilder = StringBuilder()
+            val taxListPriceBuilder = StringBuilder()
+            val taxPriceMap = mutableMapOf<String, Double>()
+
+            cartAdapter.cartList.forEach {
+                val tax = viewModel.getTaxById(it.first.taxId)
+                val priceSellNet = priceSellNetCalculator(it.first.price, tax!!.value)
+                val taxPrice = it.first.price - priceSellNet
+
+                if (taxPriceMap.containsKey(tax.name)) {
+                    taxPriceMap[tax.name] = taxPriceMap[tax.name]!! + taxPrice
+                } else {
+                    taxListInfoBuilder.append("${tax.name} %${tax.value} \n")
+                    taxPriceMap[tax.name] = taxPrice
+                }
+
+                totalTax += taxPrice
             }
+
+            taxPriceMap.forEach { (_, price) ->
+                taxListPriceBuilder.append("${formattingDoubleValues(price)} \n")
+            }
+            val netPrice = totalPrice - totalTax
+
+            paymentInfoBuilder.append("\nPayed \n")
+            paymentPriceBuilder.append("\n ${formattingDoubleValues(totalPrice)} \n")
+            paymentInfoBuilder.append("Total Tax \n")
+            paymentPriceBuilder.append("${formattingDoubleValues(totalTax)} \n")
+            paymentInfoBuilder.append("Net Price \n")
+            paymentPriceBuilder.append("${formattingDoubleValues(netPrice)} \n")
+            paymentInfoBuilder.append(taxListInfoBuilder)
+            paymentPriceBuilder.append(taxListPriceBuilder)
+
+            alertBinding.paymentInformation.text = paymentInfoBuilder.toString()
+            alertBinding.paymentInformationPrice.text = paymentPriceBuilder.toString()
+            alertBinding.totalSellingPrice.text = formattingDoubleValues(totalPrice)
+            alertBinding.totalPriceProcessRow.text = formattingDoubleValues(totalPrice)
+            val sellingType = viewModel.getSellingTypeById(type)
+            alertBinding.sellingType.text = sellingType?.name ?: "Other"
         }
+    }
+
+    private fun formattingDoubleValues(value: Double): String {
+        return String.format(Locale.getDefault(), "%.1f", value)
+    }
+
+    private fun priceSellNetCalculator(grossPrice: Double, taxValue: Double): Double {
+        return grossPrice / ((taxValue / 100) + 1)
     }
 
     private fun setReceiptDateAndClock(alertBinding: ReceiptDialogBinding) {
