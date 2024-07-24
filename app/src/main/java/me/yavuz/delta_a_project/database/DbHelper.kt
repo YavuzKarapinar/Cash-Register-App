@@ -1,5 +1,6 @@
 package me.yavuz.delta_a_project.database
 
+import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
@@ -37,6 +38,9 @@ class DbHelper private constructor(context: Context) :
         //selling process
         db?.execSQL(DatabaseConstants.CREATE_SELLING_PROCESS_TABLE_QUERY)
         db?.execSQL(DatabaseConstants.CREATE_SELLING_PROCESS_TYPE_TABLE_QUERY)
+
+        val values = ContentValues().apply { put("name", "admin") }
+        db?.insert("user_type", null, values)
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, p1: Int, p2: Int) {

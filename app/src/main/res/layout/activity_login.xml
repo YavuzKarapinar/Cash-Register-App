@@ -7,61 +7,12 @@
     android:layout_height="match_parent"
     tools:context=".login.LoginActivity">
 
-    <EditText
-        android:id="@+id/loginName"
-        android:layout_width="405dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="44dp"
-        android:ems="10"
-        android:hint="Name"
-        android:inputType="text"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/loginTextView" />
-
-    <EditText
-        android:id="@+id/loginPassword"
-        android:layout_width="405dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="44dp"
-        android:ems="10"
-        android:hint="Password"
-        android:inputType="number|numberPassword"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/loginName" />
-
-    <TextView
-        android:id="@+id/loginTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="44dp"
-        android:text="User Login"
-        android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/loginDeltaImage" />
-
-    <Button
-        android:id="@+id/loginButton"
-        android:layout_width="250dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="60dp"
-        android:text="Login"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/loginPassword" />
-
-    <ImageView
-        android:id="@+id/loginDeltaImage"
-        android:layout_width="400dp"
-        android:layout_height="150dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.514"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.024"
-        app:srcCompat="@drawable/logod" />
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/loginFrame"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/login_nav_graph" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
