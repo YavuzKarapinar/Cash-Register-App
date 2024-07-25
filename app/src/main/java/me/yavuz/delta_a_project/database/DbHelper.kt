@@ -39,8 +39,20 @@ class DbHelper private constructor(context: Context) :
         db?.execSQL(DatabaseConstants.CREATE_SELLING_PROCESS_TABLE_QUERY)
         db?.execSQL(DatabaseConstants.CREATE_SELLING_PROCESS_TYPE_TABLE_QUERY)
 
+        //inserting initial values
+        initialValues(db)
+    }
+
+    private fun initialValues(db: SQLiteDatabase?) {
         val values = ContentValues().apply { put("name", "admin") }
         db?.insert("user_type", null, values)
+
+        val sellingType1 = ContentValues().apply { put("name", "cash") }
+        db?.insert("selling_process_type", null, sellingType1)
+        val sellingType2 = ContentValues().apply { put("name", "card") }
+        db?.insert("selling_process_type", null, sellingType2)
+        val sellingType3 = ContentValues().apply { put("name", "other") }
+        db?.insert("selling_process_type", null, sellingType3)
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, p1: Int, p2: Int) {
