@@ -49,11 +49,11 @@ class DbHelper private constructor(context: Context) :
         val staff = ContentValues().apply { put("name", "Staff") }
         db?.insert("user_type", null, staff)
 
-        val sellingType1 = ContentValues().apply { put("name", "cash") }
+        val sellingType1 = ContentValues().apply { put("name", "Cash") }
         db?.insert("selling_process_type", null, sellingType1)
-        val sellingType2 = ContentValues().apply { put("name", "card") }
+        val sellingType2 = ContentValues().apply { put("name", "Card") }
         db?.insert("selling_process_type", null, sellingType2)
-        val sellingType3 = ContentValues().apply { put("name", "other") }
+        val sellingType3 = ContentValues().apply { put("name", "Other") }
         db?.insert("selling_process_type", null, sellingType3)
     }
 
