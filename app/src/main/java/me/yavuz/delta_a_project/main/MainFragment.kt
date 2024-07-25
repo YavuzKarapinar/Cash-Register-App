@@ -103,6 +103,7 @@ class MainFragment : Fragment() {
             dialog.dismiss()
             clearViews()
         }
+        builder.setOnDismissListener { clearViews() }
         builder.show()
     }
 
