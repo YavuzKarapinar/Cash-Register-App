@@ -77,7 +77,7 @@ class MainActivity : AppCompatActivity() {
     private fun setVisibilityForStaff(dataFromLogin: Int) {
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                if (viewModel.getUserById(dataFromLogin)?.userTypeName == "staff") {
+                if (viewModel.getUserById(dataFromLogin)?.userTypeName == "Staff") {
                     val menu = binding.bottomNavigationView.menu
                     menu.findItem(R.id.settingsFragment).isVisible = false
                 }

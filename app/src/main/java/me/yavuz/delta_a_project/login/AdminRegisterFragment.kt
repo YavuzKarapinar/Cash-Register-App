@@ -37,7 +37,7 @@ class AdminRegisterFragment : Fragment() {
             val name = binding.registerName.text.toString()
             val password = binding.registerPassword.text.toString()
             if (isFieldsNotEmpty(name, password)) {
-                viewModel.saveUser("admin", name, password)
+                viewModel.saveUser("Admin", name, password)
                 superAdminCreated()
                 observeUser(name, password)
             } else {

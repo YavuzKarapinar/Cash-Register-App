@@ -44,8 +44,10 @@ class DbHelper private constructor(context: Context) :
     }
 
     private fun initialValues(db: SQLiteDatabase?) {
-        val values = ContentValues().apply { put("name", "admin") }
-        db?.insert("user_type", null, values)
+        val admin = ContentValues().apply { put("name", "Admin") }
+        db?.insert("user_type", null, admin)
+        val staff = ContentValues().apply { put("name", "Staff") }
+        db?.insert("user_type", null, staff)
 
         val sellingType1 = ContentValues().apply { put("name", "cash") }
         db?.insert("selling_process_type", null, sellingType1)
