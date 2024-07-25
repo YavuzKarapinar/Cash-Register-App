@@ -86,7 +86,6 @@ class MainFragment : Fragment() {
                 lifecycleScope.launch {
                     showReceipt(type)
                     processCartItems(userId, type)
-                    clearViews()
                 }
             }
         }
@@ -102,6 +101,7 @@ class MainFragment : Fragment() {
         builder.setView(alertBinding.root)
         builder.setPositiveButton("OK") { dialog, _ ->
             dialog.dismiss()
+            clearViews()
         }
         builder.show()
     }
