@@ -74,7 +74,9 @@ class MainFragment : Fragment() {
 
     private fun processReturn() {
         cartItems.forEachIndexed { index, pair ->
-            cartItems[index] = Pair(pair.first, -pair.second)
+            if(pair.second > 0) {
+                cartItems[index] = Pair(pair.first, -pair.second)
+            }
         }
         cartAdapter.notifyDataSetChanged()
         updateTotalPrice()
