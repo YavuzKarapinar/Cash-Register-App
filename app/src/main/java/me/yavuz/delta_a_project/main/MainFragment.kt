@@ -27,6 +27,7 @@ import me.yavuz.delta_a_project.model.SellingProcess
 import me.yavuz.delta_a_project.viewmodel.MainViewModel
 import me.yavuz.delta_a_project.viewmodel.SharedViewModel
 import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -195,7 +196,8 @@ class MainFragment : Fragment() {
     }
 
     private fun formatDouble(value: Double): String {
-        return String.format(Locale.getDefault(), "%.1f", value)
+        val df = DecimalFormat("#0.0", DecimalFormatSymbols(Locale.US))
+        return df.format(value)
     }
 
     private suspend fun processCartItems(userId: Int, sellingType: Int) {
