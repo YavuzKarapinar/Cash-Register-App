@@ -8,7 +8,7 @@ class GroupDAO(private val db: SQLiteDatabase) {
 
     fun getGroups(): List<Group> {
         val groups = mutableListOf<Group>()
-        val sql = "SELECT id, name FROM `group`"
+        val sql = "SELECT id, name FROM groups"
 
         db.rawQuery(sql, null).use {
             while (it.moveToNext()) {
@@ -20,7 +20,7 @@ class GroupDAO(private val db: SQLiteDatabase) {
     }
 
     fun getGroupById(id: Int): Group? {
-        val sql = "SELECT id, name FROM `group` WHERE id = ?"
+        val sql = "SELECT id, name FROM groups WHERE id = ?"
 
         db.rawQuery(sql, arrayOf(id.toString())).use {
             if (it.moveToFirst()) {
@@ -32,7 +32,7 @@ class GroupDAO(private val db: SQLiteDatabase) {
     }
 
     fun getGroupByName(name: String): Group? {
-        val sql = "SELECT id, name FROM `group` WHERE name = ?"
+        val sql = "SELECT id, name FROM groups WHERE name = ?"
 
         db.rawQuery(sql, arrayOf(name)).use {
             if (it.moveToFirst()) {
@@ -43,11 +43,20 @@ class GroupDAO(private val db: SQLiteDatabase) {
         return null
     }
 
+    fun isGroupExists(name: String): Boolean {
+        val sql =
+            "SELECT * FROM groups WHERE name = ?"
+
+        db.rawQuery(sql, arrayOf(name)).use {
+            return it.moveToFirst()
+        }
+    }
+
     fun saveGroup(groupName: String) {
         val values = ContentValues().apply {
             put("name", groupName)
         }
 
-        db.insert("`group`", null, values)
+        db.insert("groups", null, values)
     }
 }

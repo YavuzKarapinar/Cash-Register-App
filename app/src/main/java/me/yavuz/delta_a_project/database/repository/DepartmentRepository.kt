@@ -23,6 +23,10 @@ class DepartmentRepository(context: Context) {
         }
     }
 
+    fun isDepartmentExists(name: String): Boolean {
+        return departmentDAO.isDepartmentExists(name)
+    }
+
     suspend fun saveDepartment(group: String, name: String) {
         withContext(Dispatchers.IO) {
             departmentDAO.saveDepartment(group, name)

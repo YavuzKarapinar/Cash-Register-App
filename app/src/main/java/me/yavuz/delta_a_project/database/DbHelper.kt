@@ -58,8 +58,8 @@ class DbHelper private constructor(context: Context) :
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, p1: Int, p2: Int) {
-         db?.execSQL("DROP TABLE IF EXISTS `group`")
-         db?.execSQL("DROP TABLE IF EXISTS `department`")
+         db?.execSQL("DROP TABLE IF EXISTS `groups`")
+         db?.execSQL("DROP TABLE IF EXISTS `departments`")
          db?.execSQL("DROP TABLE IF EXISTS `products`")
          db?.execSQL("DROP TABLE IF EXISTS `taxes`")
          db?.execSQL("DROP TABLE IF EXISTS `users`")

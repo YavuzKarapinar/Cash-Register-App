@@ -8,17 +8,8 @@ class DepartmentDAO(private val db: SQLiteDatabase) {
 
     private val groupDAO = GroupDAO(db)
 
-    fun saveDepartment(group: String, name: String) {
-        val values = ContentValues().apply {
-            put("group_id", groupDAO.getGroupByName(group)?.id)
-            put("name", name)
-        }
-
-        db.insert("department", null, values)
-    }
-
     fun getDepartmentByName(name: String): Department? {
-        val sql = "SELECT id, group_id, name FROM `department` WHERE name = ?"
+        val sql = "SELECT id, group_id, name FROM departments WHERE name = ?"
 
         db.rawQuery(sql, arrayOf(name)).use {
             if (it.moveToFirst()) {
@@ -31,7 +22,7 @@ class DepartmentDAO(private val db: SQLiteDatabase) {
 
     fun getDepartments(): List<Department> {
         val departments = mutableListOf<Department>()
-        val sql = "SELECT id, group_id, name FROM `department`"
+        val sql = "SELECT id, group_id, name FROM departments"
         db.rawQuery(sql, null).use {
             while (it.moveToNext()) {
                 departments.add(Department(it.getInt(0), it.getInt(1), it.getString(2)))
@@ -39,6 +30,24 @@ class DepartmentDAO(private val db: SQLiteDatabase) {
         }
 
         return departments
+    }
+
+    fun isDepartmentExists(name: String): Boolean {
+        val sql =
+            "SELECT * FROM departments WHERE name = ?"
+
+        db.rawQuery(sql, arrayOf(name)).use {
+            return it.moveToFirst()
+        }
+    }
+
+    fun saveDepartment(group: String, name: String) {
+        val values = ContentValues().apply {
+            put("group_id", groupDAO.getGroupByName(group)?.id)
+            put("name", name)
+        }
+
+        db.insert("departments", null, values)
     }
 
 }

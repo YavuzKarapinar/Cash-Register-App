@@ -51,15 +51,23 @@ class SettingsTaxAddFragment : Fragment() {
                 "Please fill all fields!",
                 Toast.LENGTH_SHORT
             ).show()
-
             return
-        } else {
+        }
+
+        if (viewModel.isTaxExists(name)) {
             Toast.makeText(
+                binding.root.context,
+                "This tax already exists!",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+
+        Toast.makeText(
                 binding.root.context,
                 "Tax saved!",
                 Toast.LENGTH_SHORT
-            ).show()
-            viewModel.saveTax(name, value)
-        }
+        ).show()
+        viewModel.saveTax(name, value)
     }
 }

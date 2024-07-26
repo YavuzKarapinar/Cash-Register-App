@@ -41,6 +41,15 @@ class TaxDAO(private val db: SQLiteDatabase) {
         return null
     }
 
+    fun isTaxExists(name: String): Boolean {
+        val sql =
+            "SELECT * FROM taxes WHERE name = ?"
+
+        db.rawQuery(sql, arrayOf(name)).use {
+            return it.moveToFirst()
+        }
+    }
+
     fun saveTax(name: String, value: Double) {
         val values = ContentValues().apply {
             put("name", name)

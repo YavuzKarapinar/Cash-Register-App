@@ -33,6 +33,15 @@ class UserDAO(private val db: SQLiteDatabase) {
         return null
     }
 
+    fun isUserExists(name: String): Boolean {
+        val sql =
+            "SELECT * FROM users WHERE name = ?"
+
+        db.rawQuery(sql, arrayOf(name)).use {
+            return it.moveToFirst()
+        }
+    }
+
     fun saveUser(userTypeName: String, name: String, password: String) {
         val userType = getUserTypeByName(userTypeName)
         val values = ContentValues().apply {

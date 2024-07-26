@@ -43,12 +43,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return userRepository.getUserById(id)
     }
 
-    fun saveUser(userTypeName: String, name: String, password: String) {
-        viewModelScope.launch {
-            userRepository.saveUser(userTypeName, name, password)
-        }
-    }
-
     fun getUsers(): LiveData<List<User>> {
         val usersLiveData = MutableLiveData<List<User>>()
         viewModelScope.launch {
@@ -56,6 +50,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             usersLiveData.postValue(users)
         }
         return usersLiveData
+    }
+
+    fun saveUser(userTypeName: String, name: String, password: String) {
+        viewModelScope.launch {
+            userRepository.saveUser(userTypeName, name, password)
+        }
+    }
+
+    fun isUserExists(name: String): Boolean {
+        return userRepository.isUserExists(name)
     }
 
     fun getUserTypes(): LiveData<List<UserType>> {
@@ -75,6 +79,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         return groupsLiveData
+    }
+
+    fun isGroupExists(name: String): Boolean {
+        return groupRepository.isGroupExists(name)
     }
 
     fun saveGroup(name: String) {
@@ -97,6 +105,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return departmentRepository.getDepartmentByName(name)
     }
 
+    fun isDepartmentExists(name: String): Boolean {
+        return departmentRepository.isDepartmentExists(name)
+    }
+
     fun saveDepartment(group: String, name: String) {
         viewModelScope.launch {
             departmentRepository.saveDepartment(group, name)
@@ -117,8 +129,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return taxRepository.getTaxByName(name)
     }
 
-    suspend fun getTaxById(id: Int): Tax? {
+    fun getTaxById(id: Int): Tax? {
         return taxRepository.getTaxById(id)
+    }
+
+    fun isTaxExists(name: String): Boolean {
+        return taxRepository.isTaxExists(name)
     }
 
     fun saveTax(name: String, value: Double) {
@@ -138,6 +154,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     suspend fun getProductById(id: Int): Product? {
         return productRepository.getProductById(id)
+    }
+
+    fun isProductExists(name: String): Boolean {
+        return productRepository.isProductExists(name)
     }
 
     fun saveProduct(product: Product) {

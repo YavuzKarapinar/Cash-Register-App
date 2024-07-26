@@ -41,14 +41,23 @@ class SettingsGroupAddFragment : Fragment() {
                 "Please fill all fields!",
                 Toast.LENGTH_SHORT
             ).show()
-        } else {
+        }
+
+        if (viewModel.isGroupExists(groupName)) {
             Toast.makeText(
                 binding.root.context,
-                "Group saved!",
+                "This group already exists!",
                 Toast.LENGTH_SHORT
             ).show()
-
-            viewModel.saveGroup(groupName)
+            return
         }
+
+        Toast.makeText(
+            binding.root.context,
+            "Group saved!",
+            Toast.LENGTH_SHORT
+        ).show()
+
+        viewModel.saveGroup(groupName)
     }
 }

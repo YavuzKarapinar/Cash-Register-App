@@ -23,15 +23,19 @@ class UserRepository(context: Context) {
         }
     }
 
-    suspend fun saveUser(userTypeName: String, name: String, password: String) {
-        withContext(Dispatchers.IO) {
-            userDAO.saveUser(userTypeName, name, password)
-        }
+    fun isUserExists(name: String): Boolean {
+        return userDAO.isUserExists(name)
     }
 
     suspend fun getUsers(): List<User> {
         return withContext(Dispatchers.IO) {
             userDAO.getUsers()
+        }
+    }
+
+    suspend fun saveUser(userTypeName: String, name: String, password: String) {
+        withContext(Dispatchers.IO) {
+            userDAO.saveUser(userTypeName, name, password)
         }
     }
 

@@ -7,36 +7,36 @@ class DatabaseConstants {
         const val DATABASE_VERSION = 1
 
         const val CREATE_GROUP_TABLE_QUERY =
-            "CREATE TABLE `group` (" +
+            "CREATE TABLE `groups` (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "name TEXT" +
+                    "name TEXT UNIQUE" +
                     ")"
 
         const val CREATE_DEPARTMENT_TABLE_QUERY =
-            "CREATE TABLE `department` (" +
+            "CREATE TABLE `departments` (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "name TEXT, " +
+                    "name TEXT UNIQUE, " +
                     "group_id INTEGER, " +
-                    "FOREIGN KEY (group_id) REFERENCES `group`(id)" +
+                    "FOREIGN KEY (group_id) REFERENCES `groups`(id)" +
                     ")"
 
         const val CREATE_PRODUCTS_TABLE_QUERY =
             "CREATE TABLE `products` (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "name TEXT, " +
+                    "name TEXT UNIQUE, " +
                     "department_id INTEGER, " +
                     "product_number INTEGER, " +
                     "tax_id INTEGER, " +
                     "gross_price REAL, " +
                     "stock INTEGER, " +
-                    "FOREIGN KEY (department_id) REFERENCES `department`(id), " +
+                    "FOREIGN KEY (department_id) REFERENCES `departments`(id), " +
                     "FOREIGN KEY (tax_id) REFERENCES `taxes`(id)" +
                     ")"
 
         const val CREATE_TAXES_TABLE_QUERY =
             "CREATE TABLE `taxes` (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "name TEXT, " +
+                    "name TEXT UNIQUE, " +
                     "value REAL" +
                     ")"
 
@@ -44,7 +44,7 @@ class DatabaseConstants {
             "CREATE TABLE `users` (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "user_type_id INTEGER, " +
-                    "name TEXT, " +
+                    "name TEXT UNIQUE, " +
                     "password TEXT, " +
                     "FOREIGN KEY (user_type_id) REFERENCES `user_type`(id)" +
                     ")"

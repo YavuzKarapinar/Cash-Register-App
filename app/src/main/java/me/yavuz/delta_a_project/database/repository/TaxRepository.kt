@@ -23,10 +23,12 @@ class TaxRepository(context: Context) {
         }
     }
 
-    suspend fun getTaxById(id: Int): Tax? {
-        return withContext(Dispatchers.IO) {
-            taxDAO.getTaxById(id)
-        }
+    fun getTaxById(id: Int): Tax? {
+        return taxDAO.getTaxById(id)
+    }
+
+    fun isTaxExists(name: String): Boolean {
+        return taxDAO.isTaxExists(name)
     }
 
     suspend fun saveTax(name: String, value: Double) {

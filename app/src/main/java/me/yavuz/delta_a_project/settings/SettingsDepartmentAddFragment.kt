@@ -43,15 +43,25 @@ class SettingsDepartmentAddFragment : Fragment() {
                 "Please fill all fields!",
                 Toast.LENGTH_SHORT
             ).show()
-        } else {
+            return
+        }
+
+        if (viewModel.isDepartmentExists(name)) {
             Toast.makeText(
                 binding.root.context,
-                "Department saved!",
+                "This department already exists!",
                 Toast.LENGTH_SHORT
             ).show()
-
-            viewModel.saveDepartment(group, name)
+            return
         }
+
+        Toast.makeText(
+            binding.root.context,
+            "Department saved!",
+            Toast.LENGTH_SHORT
+        ).show()
+
+        viewModel.saveDepartment(group, name)
     }
 
     private fun arrayAdapterObserve() {

@@ -37,6 +37,16 @@ class AdminRegisterFragment : Fragment() {
             val name = binding.registerName.text.toString()
             val password = binding.registerPassword.text.toString()
             if (isFieldsNotEmpty(name, password)) {
+
+                if (viewModel.isUserExists(name)) {
+                    Toast.makeText(
+                        binding.root.context,
+                        "This user already exists",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@setOnClickListener
+                }
+
                 viewModel.saveUser("Admin", name, password)
                 superAdminCreated()
                 observeUser(name, password)

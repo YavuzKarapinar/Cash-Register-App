@@ -30,6 +30,10 @@ class GroupRepository(context: Context) {
         }
     }
 
+    fun isGroupExists(name: String): Boolean {
+        return groupDAO.isGroupExists(name)
+    }
+
     suspend fun saveGroup(name: String) {
         withContext(Dispatchers.IO) {
             groupDAO.saveGroup(name)

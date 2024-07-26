@@ -50,6 +50,15 @@ class ProductDAO(private val db: SQLiteDatabase) {
         return null
     }
 
+    fun isProductExists(name: String): Boolean {
+        val sql =
+            "SELECT * FROM products WHERE name = ?"
+
+        db.rawQuery(sql, arrayOf(name)).use {
+            return it.moveToFirst()
+        }
+    }
+
     fun saveProduct(product: Product) {
         val values = ContentValues().apply {
             put("name", product.name)

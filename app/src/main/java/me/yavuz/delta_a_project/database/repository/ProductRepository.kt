@@ -23,6 +23,10 @@ class ProductRepository(context: Context) {
         }
     }
 
+    fun isProductExists(name: String): Boolean {
+        return productDAO.isProductExists(name)
+    }
+
     suspend fun saveProduct(product: Product) {
         return withContext(Dispatchers.IO) {
             productDAO.saveProduct(product)

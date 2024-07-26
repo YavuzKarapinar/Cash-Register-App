@@ -64,20 +64,30 @@ class SettingsUserAddFragment : Fragment() {
             return
         }
 
-        if (password == passwordCorrection) {
-            viewModel.saveUser(userType, name, password)
-            Toast.makeText(
-                binding.root.context,
-                "User saved!",
-                Toast.LENGTH_SHORT
-            ).show()
-        } else {
+        if (password != passwordCorrection) {
             Toast.makeText(
                 binding.root.context,
                 "Passwords must be same!",
                 Toast.LENGTH_SHORT
             ).show()
+            return
         }
+
+        if (viewModel.isUserExists(name)) {
+            Toast.makeText(
+                binding.root.context,
+                "This user already exists!",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+
+        viewModel.saveUser(userType, name, password)
+        Toast.makeText(
+            binding.root.context,
+            "User saved!",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
 }

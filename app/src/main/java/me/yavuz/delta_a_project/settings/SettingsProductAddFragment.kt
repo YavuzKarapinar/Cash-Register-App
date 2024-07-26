@@ -119,26 +119,36 @@ class SettingsProductAddFragment : Fragment() {
                 "Please fill all fields!",
                 Toast.LENGTH_SHORT
             ).show()
-        } else {
-            val departmentId =
-                withContext(Dispatchers.IO) { viewModel.getDepartmentByName(department)?.id ?: 0 }
-            val taxId = withContext(Dispatchers.IO) { viewModel.getTaxByName(tax)?.id ?: 0 }
-            val product = Product(
-                0,
-                name,
-                price.toDouble(),
-                stock.toInt(),
-                productNumber.toInt(),
-                taxId,
-                departmentId
-            )
-            withContext(Dispatchers.IO) { viewModel.saveProduct(product) }
+            return
+        }
+
+        if (viewModel.isProductExists(name)) {
             Toast.makeText(
                 binding.root.context,
-                "Product saved!",
+                "This product already exists!",
                 Toast.LENGTH_SHORT
             ).show()
+            return
         }
+
+        val departmentId =
+            withContext(Dispatchers.IO) { viewModel.getDepartmentByName(department)?.id ?: 0 }
+        val taxId = withContext(Dispatchers.IO) { viewModel.getTaxByName(tax)?.id ?: 0 }
+        val product = Product(
+            0,
+            name,
+            price.toDouble(),
+            stock.toInt(),
+            productNumber.toInt(),
+            taxId,
+            departmentId
+        )
+        viewModel.saveProduct(product)
+        Toast.makeText(
+            binding.root.context,
+            "Product saved!",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     private suspend fun onUpdateClick(productId: Int) {
