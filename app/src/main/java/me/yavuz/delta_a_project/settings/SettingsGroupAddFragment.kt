@@ -82,6 +82,9 @@ class SettingsGroupAddFragment : Fragment() {
                         "Deleted!",
                         Toast.LENGTH_SHORT
                     ).show()
+                    updateCode = 0
+                    binding.groupSave.text = "Save"
+                    binding.groupName.setText("")
                 },
                 onError = { e ->
                     if (e is SQLiteConstraintException) {

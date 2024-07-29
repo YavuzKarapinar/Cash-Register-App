@@ -119,6 +119,9 @@ class SettingsDepartmentAddFragment : Fragment() {
                         "Deleted!",
                         Toast.LENGTH_SHORT
                     ).show()
+                    updateCode = 0
+                    binding.departmentSave.text = "Save"
+                    binding.departmentName.setText("")
                 },
                 onError = { e ->
                     if (e is SQLiteConstraintException) {
