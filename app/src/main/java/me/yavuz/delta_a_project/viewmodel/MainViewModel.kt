@@ -150,6 +150,27 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun deleteDepartment(
+        department: Department,
+        onSuccess: () -> Unit,
+        onError: (Exception) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                departmentRepository.deleteDepartment(department)
+                onSuccess()
+            } catch (e: SQLiteConstraintException) {
+                onError(e)
+            }
+        }
+    }
+
+    fun updateDepartment(department: Department) {
+        viewModelScope.launch {
+            departmentRepository.updateDepartment(department)
+        }
+    }
+
     fun getTaxes(): LiveData<List<Tax>> {
         val taxesLiveData = MutableLiveData<List<Tax>>()
         viewModelScope.launch {

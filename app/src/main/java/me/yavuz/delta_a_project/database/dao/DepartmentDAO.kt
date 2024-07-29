@@ -1,6 +1,7 @@
 package me.yavuz.delta_a_project.database.dao
 
 import android.content.ContentValues
+import android.database.sqlite.SQLiteConstraintException
 import android.database.sqlite.SQLiteDatabase
 import me.yavuz.delta_a_project.model.Department
 
@@ -48,6 +49,23 @@ class DepartmentDAO(private val db: SQLiteDatabase) {
         }
 
         db.insert("departments", null, values)
+    }
+
+    @Throws(SQLiteConstraintException::class)
+    fun deleteDepartment(department: Department) {
+        try {
+            db.delete("departments", "id = ?", arrayOf(department.id.toString()))
+        } catch (e: SQLiteConstraintException) {
+            throw e
+        }
+    }
+
+    fun updateDepartment(department: Department) {
+        val values = ContentValues().apply {
+            put("group_id", department.groupId)
+            put("name", department.name)
+        }
+        db.update("departments", values, "id = ?", arrayOf(department.id.toString()))
     }
 
 }

@@ -1,6 +1,7 @@
 package me.yavuz.delta_a_project.database.repository
 
 import android.content.Context
+import android.database.sqlite.SQLiteConstraintException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import me.yavuz.delta_a_project.database.DbHelper
@@ -30,6 +31,19 @@ class DepartmentRepository(context: Context) {
     suspend fun saveDepartment(group: String, name: String) {
         withContext(Dispatchers.IO) {
             departmentDAO.saveDepartment(group, name)
+        }
+    }
+
+    @Throws(SQLiteConstraintException::class)
+    suspend fun deleteDepartment(department: Department) {
+        withContext(Dispatchers.IO) {
+            departmentDAO.deleteDepartment(department)
+        }
+    }
+
+    suspend fun updateDepartment(department: Department) {
+        withContext(Dispatchers.IO) {
+            departmentDAO.updateDepartment(department)
         }
     }
 }
