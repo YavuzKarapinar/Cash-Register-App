@@ -184,9 +184,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun deleteProduct(product: Product) {
+    fun deleteProduct(product: Product, onSuccess: () -> Unit, onError: (Exception) -> Unit) {
         viewModelScope.launch {
-            productRepository.deleteProduct(product)
+            try {
+                productRepository.deleteProduct(product)
+                onSuccess()
+            } catch (e: SQLiteConstraintException) {
+                onError(e)
+            }
         }
     }
 

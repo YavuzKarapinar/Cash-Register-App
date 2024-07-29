@@ -1,6 +1,7 @@
 package me.yavuz.delta_a_project.database.repository
 
 import android.content.Context
+import android.database.sqlite.SQLiteConstraintException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import me.yavuz.delta_a_project.database.DbHelper
@@ -33,6 +34,7 @@ class ProductRepository(context: Context) {
         }
     }
 
+    @Throws(SQLiteConstraintException::class)
     suspend fun deleteProduct(product: Product) {
         withContext(Dispatchers.IO) {
             productDAO.deleteProduct(product)

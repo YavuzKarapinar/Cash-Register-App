@@ -1,5 +1,6 @@
 package me.yavuz.delta_a_project.settings
 
+import android.database.sqlite.SQLiteConstraintException
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -61,9 +62,25 @@ class SettingsProductListFragment : Fragment() {
     private fun onDeleteClicked(position: Int) {
         val products = productListAdapter.getData()
         if (position in products.indices) {
-            viewModel.deleteProduct(products[position])
-            observeProducts()
-            Toast.makeText(context, "Deleted!", Toast.LENGTH_SHORT).show()
+            viewModel.deleteProduct(products[position],
+                onSuccess = {
+                    observeProducts()
+                    Toast.makeText(
+                        context,
+                        "Deleted!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                },
+                onError = { e ->
+                    if (e is SQLiteConstraintException) {
+                        Toast.makeText(
+                            context,
+                            "This product cannot be deleted!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            )
         } else {
             Toast.makeText(context, "Product not found!", Toast.LENGTH_SHORT).show()
         }

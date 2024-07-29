@@ -1,7 +1,9 @@
 package me.yavuz.delta_a_project.database.dao
 
 import android.content.ContentValues
+import android.database.sqlite.SQLiteConstraintException
 import android.database.sqlite.SQLiteDatabase
+import android.util.Log
 import me.yavuz.delta_a_project.model.Product
 
 class ProductDAO(private val db: SQLiteDatabase) {
@@ -71,8 +73,14 @@ class ProductDAO(private val db: SQLiteDatabase) {
         db.insert("products", null, values)
     }
 
+    @Throws(SQLiteConstraintException::class)
     fun deleteProduct(product: Product) {
-        db.delete("products", "id = ?", arrayOf(product.id.toString()))
+        try {
+            db.delete("products", "id = ?", arrayOf(product.id.toString()))
+        } catch (e: SQLiteConstraintException) {
+            Log.e("DeleteUser", "Cannot delete user: Foreign key constraint violation")
+            throw e
+        }
     }
 
     fun updateProduct(product: Product) {

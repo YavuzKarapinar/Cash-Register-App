@@ -158,6 +158,7 @@ class SettingsProductAddFragment : Fragment() {
         val department = binding.productDepartmentSpinner.selectedItem.toString()
         val tax = binding.productTaxSpinner.selectedItem.toString()
         val productNumber = binding.productNumber.text.toString()
+        val oldProduct = viewModel.getProductById(productId)
 
         if (isFieldsEmpty(name, price, stock, productNumber, department, tax)) {
             Toast.makeText(
@@ -165,26 +166,37 @@ class SettingsProductAddFragment : Fragment() {
                 "Please fill all fields!",
                 Toast.LENGTH_SHORT
             ).show()
-        } else {
-            val departmentId =
-                withContext(Dispatchers.IO) { viewModel.getDepartmentByName(department)?.id ?: 0 }
-            val taxId = withContext(Dispatchers.IO) { viewModel.getTaxByName(tax)?.id ?: 0 }
-            val newProduct = Product(
-                productId,
-                name,
-                price.toDouble(),
-                stock.toInt(),
-                productNumber.toInt(),
-                taxId,
-                departmentId
-            )
-            withContext(Dispatchers.IO) { viewModel.updateProduct(newProduct) }
+            return
+        }
+
+        if (oldProduct?.name != name && viewModel.isProductExists(name)) {
             Toast.makeText(
                 binding.root.context,
-                "Product updated!",
+                "This product already exists!",
                 Toast.LENGTH_SHORT
             ).show()
+            return
         }
+
+        val departmentId =
+            withContext(Dispatchers.IO) { viewModel.getDepartmentByName(department)?.id ?: 0 }
+        val taxId = withContext(Dispatchers.IO) { viewModel.getTaxByName(tax)?.id ?: 0 }
+        val newProduct = Product(
+            productId,
+            name,
+            price.toDouble(),
+            stock.toInt(),
+            productNumber.toInt(),
+            taxId,
+            departmentId
+        )
+        withContext(Dispatchers.IO) { viewModel.updateProduct(newProduct) }
+        Toast.makeText(
+            binding.root.context,
+            "Product updated!",
+            Toast.LENGTH_SHORT
+        ).show()
+
     }
 
     private fun isFieldsEmpty(
