@@ -61,7 +61,9 @@ class SettingsUserAddFragment : Fragment() {
                     binding.saveUserPassword.setText(it.password)
                     binding.saveUserPasswordCorrection.setText(it.password)
 
-                    binding.button.setOnClickListener { updateClicked(value) }
+                    binding.button.setOnClickListener {
+                        lifecycleScope.launch { updateClicked(value) }
+                    }
                 }
             }
         } else {
@@ -69,12 +71,13 @@ class SettingsUserAddFragment : Fragment() {
         }
     }
 
-    private fun updateClicked(value: Int?) {
+    private suspend fun updateClicked(value: Int) {
         val position = binding.spinner.selectedItemPosition
         val userType = binding.spinner.getItemAtPosition(position) as String
         val name = binding.userSaveName.text.toString()
         val password = binding.saveUserPassword.text.toString()
         val passwordCorrection = binding.saveUserPasswordCorrection.text.toString()
+        val oldUser = viewModel.getUserById(value)
 
         if (TextUtils.isEmpty(name) ||
             TextUtils.isEmpty(password) ||
@@ -97,7 +100,16 @@ class SettingsUserAddFragment : Fragment() {
             return
         }
 
-        val newUser = User(value!!, name, password, userType)
+        if (oldUser?.name != name && viewModel.isUserExists(name)) {
+            Toast.makeText(
+                binding.root.context,
+                "This user already exists!",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+
+        val newUser = User(value, name, password, userType)
         viewModel.updateUser(newUser)
         Toast.makeText(
             binding.root.context,
