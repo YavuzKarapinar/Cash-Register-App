@@ -1,6 +1,7 @@
 package me.yavuz.delta_a_project.database.repository
 
 import android.content.Context
+import android.database.sqlite.SQLiteConstraintException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import me.yavuz.delta_a_project.database.DbHelper
@@ -30,6 +31,19 @@ class UserRepository(context: Context) {
     suspend fun getUsers(): List<User> {
         return withContext(Dispatchers.IO) {
             userDAO.getUsers()
+        }
+    }
+
+    @Throws(SQLiteConstraintException::class)
+    suspend fun deleteUser(user: User) {
+        return withContext(Dispatchers.IO) {
+            userDAO.deleteUser(user)
+        }
+    }
+
+    suspend fun updateUser(user: User) {
+        return withContext(Dispatchers.IO) {
+            userDAO.updateUser(user)
         }
     }
 

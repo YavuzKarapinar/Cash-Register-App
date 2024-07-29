@@ -15,12 +15,20 @@ class SettingsUserListAdapter :
 
     private var fullItemList: List<User> = emptyList()
     var onItemClick: ((User) -> Unit)? = null
+    lateinit var onActionListener: OnActionListener
 
     inner class UserListViewHolder(private val binding: FragmentUserListItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(user: User) {
             binding.userListName.text = user.name
             binding.userListUserType.text = user.userTypeName
+            binding.deleteImage.setOnClickListener {
+                onActionListener.onDelete(adapterPosition)
+            }
+
+            binding.updateImage.setOnClickListener {
+                onActionListener.onUpdate(adapterPosition)
+            }
         }
 
         init {
@@ -43,6 +51,10 @@ class SettingsUserListAdapter :
     fun setData(updatedList: List<User>) {
         fullItemList = updatedList
         submitList(updatedList)
+    }
+
+    fun getData(): List<User> {
+        return fullItemList
     }
 
     override fun getFilter(): Filter {
@@ -82,6 +94,4 @@ class SettingsUserListAdapter :
             }
         }
     }
-
-
 }

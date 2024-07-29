@@ -2,6 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/borders"
+    android:padding="5dp"
     android:orientation="horizontal">
 
     <TextView
@@ -17,9 +19,27 @@
         android:id="@+id/userListUserType"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:gravity="end"
+        android:gravity="start"
         android:layout_weight="1"
         android:padding="5sp"
         android:textSize="32sp" />
+
+    <ImageView
+        android:id="@+id/updateImage"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="0.2"
+        android:gravity="end"
+        android:padding="5sp"
+        android:src="@drawable/baseline_update_24" />
+
+    <ImageView
+        android:id="@+id/deleteImage"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="0.2"
+        android:gravity="end"
+        android:padding="5sp"
+        android:src="@drawable/baseline_delete_24" />
 
 </LinearLayout>

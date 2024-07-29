@@ -139,7 +139,7 @@ class MainFragment : Fragment() {
         }
     }
 
-    private suspend fun calculateTotalTax(): Double {
+    private fun calculateTotalTax(): Double {
         var totalTax = 0.0
         cartAdapter.cartList.forEach {
             val tax = viewModel.getTaxById(it.first.taxId)

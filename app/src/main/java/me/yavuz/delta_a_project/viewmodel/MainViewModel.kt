@@ -1,6 +1,7 @@
 package me.yavuz.delta_a_project.viewmodel
 
 import android.app.Application
+import android.database.sqlite.SQLiteConstraintException
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -50,6 +51,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             usersLiveData.postValue(users)
         }
         return usersLiveData
+    }
+
+    fun deleteUser(user: User, onSuccess: () -> Unit, onError: (Exception) -> Unit) {
+        viewModelScope.launch {
+            try {
+                userRepository.deleteUser(user)
+                onSuccess()
+            } catch (e: SQLiteConstraintException) {
+                onError(e)
+            }
+        }
+    }
+
+    fun updateUser(user: User) {
+        viewModelScope.launch {
+            userRepository.updateUser(user)
+        }
     }
 
     fun saveUser(userTypeName: String, name: String, password: String) {

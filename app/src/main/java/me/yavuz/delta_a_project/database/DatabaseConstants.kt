@@ -65,9 +65,9 @@ class DatabaseConstants {
                     "amount REAL, " +
                     "user_id INTEGER, " +
                     "selling_format TEXT," +
-                    "FOREIGN KEY (selling_process_type_id) REFERENCES `selling_process_type`(id) ON DELETE CASCADE, " +
-                    "FOREIGN KEY (product_id) REFERENCES `products`(id) ON DELETE CASCADE, " +
-                    "FOREIGN KEY (user_id) REFERENCES `users`(id) ON DELETE CASCADE" +
+                    "FOREIGN KEY (selling_process_type_id) REFERENCES `selling_process_type`(id) ON DELETE RESTRICT, " +
+                    "FOREIGN KEY (product_id) REFERENCES `products`(id) ON DELETE RESTRICT, " +
+                    "FOREIGN KEY (user_id) REFERENCES `users`(id) ON DELETE RESTRICT" +
                     ")"
 
         const val CREATE_SELLING_PROCESS_TYPE_TABLE_QUERY =

@@ -1,7 +1,9 @@
 package me.yavuz.delta_a_project.database.dao
 
 import android.content.ContentValues
+import android.database.sqlite.SQLiteConstraintException
 import android.database.sqlite.SQLiteDatabase
+import android.util.Log
 import me.yavuz.delta_a_project.model.User
 import me.yavuz.delta_a_project.model.UserType
 
@@ -40,6 +42,27 @@ class UserDAO(private val db: SQLiteDatabase) {
         db.rawQuery(sql, arrayOf(name)).use {
             return it.moveToFirst()
         }
+    }
+
+    @Throws(SQLiteConstraintException::class)
+    fun deleteUser(user: User) {
+        try {
+            db.delete("users", "id = ?", arrayOf(user.id.toString()))
+        } catch (e: SQLiteConstraintException) {
+            Log.e("DeleteUser", "Cannot delete user: Foreign key constraint violation")
+            throw e
+        }
+    }
+
+    fun updateUser(user: User) {
+        val userType = getUserTypeByName(user.userTypeName)
+        val values = ContentValues().apply {
+            put("user_type_id", userType?.id)
+            put("name", user.name)
+            put("password", user.password)
+        }
+        db.update("users", values, "id = ?", arrayOf(user.id.toString()))
+
     }
 
     fun saveUser(userTypeName: String, name: String, password: String) {

@@ -9,8 +9,11 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import me.yavuz.delta_a_project.R
 import me.yavuz.delta_a_project.databinding.FragmentSettingsUserAddBinding
+import me.yavuz.delta_a_project.model.User
 import me.yavuz.delta_a_project.viewmodel.MainViewModel
 
 class SettingsUserAddFragment : Fragment() {
@@ -29,6 +32,9 @@ class SettingsUserAddFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         var types: List<String> = mutableListOf()
+        val value = arguments?.getInt("userId")
+
+        onPageShow(value)
 
         val adapter =
             ArrayAdapter(binding.root.context, R.layout.spinner_item, types)
@@ -44,6 +50,60 @@ class SettingsUserAddFragment : Fragment() {
         binding.button.setOnClickListener {
             userSave()
         }
+    }
+
+    private fun onPageShow(value: Int?) {
+        if (value != null && value != 0) {
+            lifecycleScope.launch {
+                val user = viewModel.getUserById(value)
+                user?.let {
+                    binding.userSaveName.setText(it.name)
+                    binding.saveUserPassword.setText(it.password)
+                    binding.saveUserPasswordCorrection.setText(it.password)
+
+                    binding.button.setOnClickListener { updateClicked(value) }
+                }
+            }
+        } else {
+            binding.button.setOnClickListener { userSave() }
+        }
+    }
+
+    private fun updateClicked(value: Int?) {
+        val position = binding.spinner.selectedItemPosition
+        val userType = binding.spinner.getItemAtPosition(position) as String
+        val name = binding.userSaveName.text.toString()
+        val password = binding.saveUserPassword.text.toString()
+        val passwordCorrection = binding.saveUserPasswordCorrection.text.toString()
+
+        if (TextUtils.isEmpty(name) ||
+            TextUtils.isEmpty(password) ||
+            TextUtils.isEmpty(passwordCorrection)
+        ) {
+            Toast.makeText(
+                binding.root.context,
+                "Please fill all fields!",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+
+        if (password != passwordCorrection) {
+            Toast.makeText(
+                binding.root.context,
+                "Passwords must be same!",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+
+        val newUser = User(value!!, name, password, userType)
+        viewModel.updateUser(newUser)
+        Toast.makeText(
+            binding.root.context,
+            "User updated!",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     private fun userSave() {
