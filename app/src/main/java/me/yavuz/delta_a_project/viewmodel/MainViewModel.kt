@@ -109,6 +109,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun updateGroup(group: Group) {
+        viewModelScope.launch {
+            groupRepository.updateGroup(group)
+        }
+    }
+
+    fun deleteGroup(group: Group, onSuccess: () -> Unit, onError: (Exception) -> Unit) {
+        viewModelScope.launch {
+            try {
+                groupRepository.deleteGroup(group)
+                onSuccess()
+            } catch (e: SQLiteConstraintException) {
+                onError(e)
+            }
+        }
+    }
+
     fun getDepartments(): LiveData<List<Department>> {
         val departmentsLiveData = MutableLiveData<List<Department>>()
         viewModelScope.launch {

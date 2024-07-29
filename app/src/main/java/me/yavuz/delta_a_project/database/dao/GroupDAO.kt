@@ -1,6 +1,7 @@
 package me.yavuz.delta_a_project.database.dao
 
 import android.content.ContentValues
+import android.database.sqlite.SQLiteConstraintException
 import android.database.sqlite.SQLiteDatabase
 import me.yavuz.delta_a_project.model.Group
 
@@ -58,5 +59,21 @@ class GroupDAO(private val db: SQLiteDatabase) {
         }
 
         db.insert("groups", null, values)
+    }
+
+    fun updateGroup(group: Group) {
+        val values = ContentValues().apply {
+            put("name", group.name)
+        }
+        db.update("groups", values, "id = ?", arrayOf(group.id.toString()))
+    }
+
+    @Throws(SQLiteConstraintException::class)
+    fun deleteGroup(group: Group) {
+        try {
+            db.delete("groups", "id = ?", arrayOf(group.id.toString()))
+        } catch (e: SQLiteConstraintException) {
+            throw e
+        }
     }
 }
