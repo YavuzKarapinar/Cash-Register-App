@@ -1,6 +1,7 @@
 package me.yavuz.delta_a_project.database.dao
 
 import android.content.ContentValues
+import android.database.sqlite.SQLiteConstraintException
 import android.database.sqlite.SQLiteDatabase
 import me.yavuz.delta_a_project.model.Tax
 
@@ -57,5 +58,22 @@ class TaxDAO(private val db: SQLiteDatabase) {
         }
 
         db.insert("taxes", null, values)
+    }
+
+    @Throws(SQLiteConstraintException::class)
+    fun deleteTax(tax: Tax) {
+        try {
+            db.delete("taxes", "id = ?", arrayOf(tax.id.toString()))
+        } catch (e: SQLiteConstraintException) {
+            throw e
+        }
+    }
+
+    fun updateTax(tax: Tax) {
+        val values = ContentValues().apply {
+            put("name", tax.name)
+            put("value", tax.value)
+        }
+        db.update("taxes", values, "id = ?", arrayOf(tax.id.toString()))
     }
 }

@@ -48,12 +48,20 @@
 
             <Button
                 android:id="@+id/taxSave"
-                android:layout_width="400dp"
-                android:layout_height="48dp"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="65dp"
                 android:text="Save"
                 android:textSize="24sp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/taxListRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="20dp"
+                android:background="@drawable/borders"
+                android:nestedScrollingEnabled="true" />
 
         </LinearLayout>
 

@@ -199,6 +199,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun updateTax(tax: Tax) {
+        viewModelScope.launch {
+            taxRepository.updateTax(tax)
+        }
+    }
+
+    fun deleteTax(tax: Tax, onSuccess: () -> Unit, onError: (Exception) -> Unit) {
+        viewModelScope.launch {
+            try {
+                taxRepository.deleteTax(tax)
+                onSuccess()
+            } catch (e: SQLiteConstraintException) {
+                onError(e)
+            }
+        }
+    }
+
     fun getProducts(): LiveData<List<Product>> {
         val productsLiveData = MutableLiveData<List<Product>>()
         viewModelScope.launch {
