@@ -1,5 +1,6 @@
 package me.yavuz.delta_a_project.login
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
@@ -28,7 +29,7 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        retrieveRememberMe()
         binding.loginButton.setOnClickListener {
             retrieveUserData()
         }
@@ -48,6 +49,7 @@ class LoginFragment : Fragment() {
                 if (it != null) {
                     val intent = Intent(requireContext(), MainActivity::class.java)
                     intent.putExtra("userId", it.id)
+                    rememberMe(it.name)
                     startActivity(intent)
                     requireActivity().finish()
                 } else {
@@ -59,5 +61,19 @@ class LoginFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun retrieveRememberMe() {
+        val sharedPref = requireActivity().getSharedPreferences("remember_me", Context.MODE_PRIVATE)
+        sharedPref.getString("remember_me", null)?.let {
+            binding.loginName.setText(it)
+        } ?: binding.loginName.setText("")
+    }
+
+    private fun rememberMe(name: String) {
+        val sharedPref = requireActivity().getSharedPreferences("remember_me", Context.MODE_PRIVATE)
+        val editor = sharedPref.edit()
+        editor.putString("remember_me", name)
+        editor.apply()
     }
 }

@@ -15,7 +15,7 @@ class UserDAO(private val db: SQLiteDatabase) {
         db.rawQuery(sql, arrayOf(name, password)).use {
             if (it.moveToFirst()) {
                 val userType = getUserTypeById(it.getInt(1))
-                return User(it.getInt(0), userType!!.name, it.getString(2), it.getString(3))
+                return User(it.getInt(0), it.getString(2), it.getString(3), userType!!.name)
             }
         }
         return null

@@ -1,5 +1,6 @@
 package me.yavuz.delta_a_project.main
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -55,6 +56,7 @@ class MainActivity : AppCompatActivity() {
 
                 R.id.loginActivity -> {
                     navController.navigate(R.id.loginActivity)
+                    rememberMe()
                     finish()
                     true
                 }
@@ -79,5 +81,12 @@ class MainActivity : AppCompatActivity() {
                 menu.findItem(R.id.settingsFragment).isVisible = false
             }
         }
+    }
+
+    private fun rememberMe() {
+        val sharedPref = getSharedPreferences("remember_me", Context.MODE_PRIVATE)
+        val editor = sharedPref.edit()
+        editor.putString("remember_me", null)
+        editor.apply()
     }
 }

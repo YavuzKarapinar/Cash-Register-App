@@ -49,6 +49,7 @@ class AdminRegisterFragment : Fragment() {
 
                 viewModel.saveUser("Admin", name, password)
                 superAdminCreated()
+                rememberMe(name)
                 observeUser(name, password)
             } else {
                 Toast.makeText(
@@ -84,6 +85,13 @@ class AdminRegisterFragment : Fragment() {
         val sharedPref = requireActivity().getSharedPreferences("super_admin", Context.MODE_PRIVATE)
         val editor = sharedPref.edit()
         editor.putBoolean("super_admin", true)
+        editor.apply()
+    }
+
+    private fun rememberMe(name: String) {
+        val sharedPref = requireActivity().getSharedPreferences("remember_me", Context.MODE_PRIVATE)
+        val editor = sharedPref.edit()
+        editor.putString("remember_me", name)
         editor.apply()
     }
 }
