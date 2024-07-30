@@ -15,6 +15,7 @@ import me.yavuz.delta_a_project.R
 import me.yavuz.delta_a_project.adapter.OnActionListener
 import me.yavuz.delta_a_project.adapter.SettingsUserListAdapter
 import me.yavuz.delta_a_project.databinding.FragmentSettingsUserListBinding
+import me.yavuz.delta_a_project.utils.InformationUtils
 import me.yavuz.delta_a_project.viewmodel.MainViewModel
 import me.yavuz.delta_a_project.viewmodel.SharedViewModel
 
@@ -73,20 +74,20 @@ class SettingsUserListFragment : Fragment() {
                 },
                 onError = { e ->
                     if (e is SQLiteConstraintException) {
-                        Toast.makeText(
-                            context,
-                            "This user cannot be deleted!",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        InformationUtils.showInfo(
+                            requireContext(),
+                            "This user cannot be deleted.\n" +
+                                    "Because there is a connection with other data's."
+                        )
                     }
                 }
             )
         } else {
-            Toast.makeText(
-                context,
-                "This user logged in, cannot be deleted!",
-                Toast.LENGTH_SHORT
-            ).show()
+            InformationUtils.showInfo(
+                requireContext(),
+                "This user cannot be deleted.\n" +
+                        "Because this user logged in or some error occurred."
+            )
         }
     }
 

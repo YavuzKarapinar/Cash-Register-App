@@ -14,6 +14,7 @@ import me.yavuz.delta_a_project.adapter.OnActionListener
 import me.yavuz.delta_a_project.adapter.SettingsTaxListAdapter
 import me.yavuz.delta_a_project.databinding.FragmentSettingsTaxAddBinding
 import me.yavuz.delta_a_project.model.Tax
+import me.yavuz.delta_a_project.utils.InformationUtils
 import me.yavuz.delta_a_project.viewmodel.MainViewModel
 
 class SettingsTaxAddFragment : Fragment() {
@@ -126,16 +127,16 @@ class SettingsTaxAddFragment : Fragment() {
                 },
                 onError = { e ->
                     if (e is SQLiteConstraintException) {
-                        Toast.makeText(
-                            context,
-                            "This tax cannot be deleted!",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        InformationUtils.showInfo(
+                            requireContext(),
+                            "This tax cannot be deleted.\n" +
+                                    "Because there is a connection with other data's."
+                        )
                     }
                 }
             )
         } else {
-            Toast.makeText(context, "tax not found!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Tax not found!", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -150,12 +151,10 @@ class SettingsTaxAddFragment : Fragment() {
         val value = binding.taxValue.text.toString().toDouble()
 
         if (value !in 0.0..100.0) {
-            Toast.makeText(
-                binding.root.context,
-                "Tax value must be between 0 and 100!",
-                Toast.LENGTH_SHORT
-            ).show()
-
+            InformationUtils.showInfo(
+                requireContext(),
+                "Tax value must be between 0 and 100!"
+            )
             return
         }
 

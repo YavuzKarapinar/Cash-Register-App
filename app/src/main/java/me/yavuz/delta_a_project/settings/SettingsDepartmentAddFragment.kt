@@ -16,6 +16,7 @@ import me.yavuz.delta_a_project.adapter.OnActionListener
 import me.yavuz.delta_a_project.adapter.SettingsDepartmentListAdapter
 import me.yavuz.delta_a_project.databinding.FragmentSettingsDepartmentAddBinding
 import me.yavuz.delta_a_project.model.Department
+import me.yavuz.delta_a_project.utils.InformationUtils
 import me.yavuz.delta_a_project.viewmodel.MainViewModel
 
 class SettingsDepartmentAddFragment : Fragment() {
@@ -125,11 +126,11 @@ class SettingsDepartmentAddFragment : Fragment() {
                 },
                 onError = { e ->
                     if (e is SQLiteConstraintException) {
-                        Toast.makeText(
-                            context,
-                            "This department cannot be deleted!",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        InformationUtils.showInfo(
+                            requireContext(),
+                            "This department cannot be deleted.\n" +
+                                    "Because there is a connection with other data's."
+                        )
                     }
                 }
             )

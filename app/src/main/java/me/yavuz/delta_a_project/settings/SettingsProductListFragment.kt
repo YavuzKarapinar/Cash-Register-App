@@ -13,6 +13,7 @@ import me.yavuz.delta_a_project.R
 import me.yavuz.delta_a_project.adapter.OnActionListener
 import me.yavuz.delta_a_project.adapter.SettingsProductListAdapter
 import me.yavuz.delta_a_project.databinding.FragmentSettingsListProductBinding
+import me.yavuz.delta_a_project.utils.InformationUtils
 import me.yavuz.delta_a_project.viewmodel.MainViewModel
 
 class SettingsProductListFragment : Fragment() {
@@ -73,11 +74,11 @@ class SettingsProductListFragment : Fragment() {
                 },
                 onError = { e ->
                     if (e is SQLiteConstraintException) {
-                        Toast.makeText(
-                            context,
-                            "This product cannot be deleted!",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        InformationUtils.showInfo(
+                            requireContext(),
+                            "This product cannot be deleted.\n" +
+                                    "Because there is a connection with other data's."
+                        )
                     }
                 }
             )

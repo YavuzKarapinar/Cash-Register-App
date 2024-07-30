@@ -14,6 +14,7 @@ import me.yavuz.delta_a_project.adapter.OnActionListener
 import me.yavuz.delta_a_project.adapter.SettingsGroupListAdapter
 import me.yavuz.delta_a_project.databinding.FragmentSettingsGroupAddBinding
 import me.yavuz.delta_a_project.model.Group
+import me.yavuz.delta_a_project.utils.InformationUtils
 import me.yavuz.delta_a_project.viewmodel.MainViewModel
 
 class SettingsGroupAddFragment : Fragment() {
@@ -88,11 +89,11 @@ class SettingsGroupAddFragment : Fragment() {
                 },
                 onError = { e ->
                     if (e is SQLiteConstraintException) {
-                        Toast.makeText(
-                            context,
-                            "This group cannot be deleted!",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        InformationUtils.showInfo(
+                            requireContext(),
+                            "This group cannot be deleted.\n" +
+                                    "Because there is a connection with other data's."
+                        )
                     }
                 }
             )
