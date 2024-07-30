@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import me.yavuz.delta_a_project.databinding.ReceiptRecyclerItemBinding
 import me.yavuz.delta_a_project.model.Product
+import me.yavuz.delta_a_project.utils.CalculateUtils
 
 class ReceiptItemAdapter(private val cartList: MutableList<Pair<Product, Int>>) :
     RecyclerView.Adapter<ReceiptItemAdapter.ReceiptItemViewHolder>() {
@@ -17,7 +18,7 @@ class ReceiptItemAdapter(private val cartList: MutableList<Pair<Product, Int>>) 
             val quantity = cartItem.second
             binding.itemQuantity.text = quantity.toString()
             binding.itemName.text = product.name
-            binding.itemPrice.text = (product.price * quantity).toString()
+            binding.itemPrice.text = CalculateUtils.formatDouble(product.price * quantity)
         }
     }
 

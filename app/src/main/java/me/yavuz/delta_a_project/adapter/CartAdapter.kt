@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import me.yavuz.delta_a_project.databinding.FragmentMainCartItemBinding
 import me.yavuz.delta_a_project.model.Product
+import me.yavuz.delta_a_project.utils.CalculateUtils
 
 class CartAdapter(val cartList: MutableList<Pair<Product, Int>>) :
     RecyclerView.Adapter<CartAdapter.CartViewHolder>() {
@@ -16,7 +17,7 @@ class CartAdapter(val cartList: MutableList<Pair<Product, Int>>) :
             val quantity = cartItem.second
             binding.cartItemQuantity.text = quantity.toString()
             binding.cartItemName.text = product.name
-            binding.cartItemPrice.text = (product.price * quantity).toString()
+            binding.cartItemPrice.text = CalculateUtils.formatDouble(product.price * quantity)
         }
     }
 

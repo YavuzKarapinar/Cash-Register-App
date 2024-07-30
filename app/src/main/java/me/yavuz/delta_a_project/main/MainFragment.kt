@@ -22,13 +22,12 @@ import me.yavuz.delta_a_project.databinding.FragmentMainBinding
 import me.yavuz.delta_a_project.databinding.ReceiptDialogBinding
 import me.yavuz.delta_a_project.model.Product
 import me.yavuz.delta_a_project.model.SellingProcess
+import me.yavuz.delta_a_project.utils.CalculateUtils
 import me.yavuz.delta_a_project.viewmodel.MainViewModel
 import me.yavuz.delta_a_project.viewmodel.SharedViewModel
 import java.text.DecimalFormat
-import java.text.DecimalFormatSymbols
 import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
 
 class MainFragment : Fragment() {
 
@@ -111,7 +110,7 @@ class MainFragment : Fragment() {
     private fun setReceiptTotalPrices(alertBinding: ReceiptDialogBinding, type: Int) {
         lifecycleScope.launch {
             val totalTax = calculateTotalTax()
-            val totalPrice = calculateTotalPrice()
+            val totalPrice = CalculateUtils.calculateTotalPrice(cartItems)
             val netPrice = totalPrice - totalTax
             val paymentInfoBuilder = StringBuilder()
             val paymentPriceBuilder = StringBuilder()
@@ -122,16 +121,16 @@ class MainFragment : Fragment() {
                 .append("Net Price \n")
                 .append(taxDetails.first)
 
-            paymentPriceBuilder.append("\n${formatDouble(totalPrice)}\n")
-                .append("${formatDouble(totalTax)}\n")
-                .append("${formatDouble(netPrice)}\n")
+            paymentPriceBuilder.append("\n${CalculateUtils.formatDouble(totalPrice)}\n")
+                .append("${CalculateUtils.formatDouble(totalTax)}\n")
+                .append("${CalculateUtils.formatDouble(netPrice)}\n")
                 .append(taxDetails.second)
 
             alertBinding.apply {
                 paymentInformation.text = paymentInfoBuilder.toString()
                 paymentInformationPrice.text = paymentPriceBuilder.toString()
-                totalSellingPrice.text = formatDouble(totalPrice)
-                totalPriceProcessRow.text = formatDouble(totalPrice)
+                totalSellingPrice.text = CalculateUtils.formatDouble(totalPrice)
+                totalPriceProcessRow.text = CalculateUtils.formatDouble(totalPrice)
                 sellingType.text = viewModel.getSellingTypeById(type)?.name ?: "Other"
             }
         }
@@ -141,7 +140,8 @@ class MainFragment : Fragment() {
         var totalTax = 0.0
         cartAdapter.cartList.forEach {
             val tax = viewModel.getTaxById(it.first.taxId)
-            val taxPrice = it.first.price - calculateNetPrice(it.first.price, tax!!.value)
+            val taxPrice =
+                it.first.price - CalculateUtils.calculateNetPrice(it.first.price, tax!!.value)
             totalTax += taxPrice
         }
         return totalTax
@@ -154,14 +154,15 @@ class MainFragment : Fragment() {
 
         cartAdapter.cartList.forEach {
             val tax = viewModel.getTaxById(it.first.taxId)
-            val taxPrice = it.first.price - calculateNetPrice(it.first.price, tax!!.value)
+            val taxPrice =
+                it.first.price - CalculateUtils.calculateNetPrice(it.first.price, tax!!.value)
 
             taxPriceMap[tax.name] = taxPriceMap.getOrDefault(tax.name, 0.0) + taxPrice
         }
 
         taxPriceMap.forEach { (name, price) ->
             taxInfoBuilder.append("$name %${viewModel.getTaxByName(name)!!.value}\n")
-            taxPriceBuilder.append("${formatDouble(price)}\n")
+            taxPriceBuilder.append("${CalculateUtils.formatDouble(price)}\n")
         }
 
         return Pair(taxInfoBuilder.toString(), taxPriceBuilder.toString())
@@ -183,19 +184,6 @@ class MainFragment : Fragment() {
         return alertBinding
     }
 
-    private fun calculateNetPrice(grossPrice: Double, taxValue: Double): Double {
-        return grossPrice / ((taxValue / 100) + 1)
-    }
-
-    private fun calculateTotalPrice(): Double {
-        return cartItems.sumOf { it.first.price * it.second }
-    }
-
-    private fun formatDouble(value: Double): String {
-        val df = DecimalFormat("#0.0", DecimalFormatSymbols(Locale.US))
-        return df.format(value)
-    }
-
     private suspend fun processCartItems(userId: Int, sellingType: Int) {
         cartItems.forEach { item ->
             val sellingFormat = if (item.second > 0) "SALE" else "RETURN"
@@ -210,11 +198,11 @@ class MainFragment : Fragment() {
         sellingType: Int
     ) {
         val tax = viewModel.getTaxById(item.first.taxId)
-        val netPrice = calculateNetPrice(item.first.price, tax!!.value)
+        val netPrice = CalculateUtils.calculateNetPrice(item.first.price, tax!!.value)
         val sellingProcess = SellingProcess(
             id = 0,
             quantity = item.second,
-            priceSell = formatDouble(netPrice).toDouble(),
+            priceSell = CalculateUtils.formatDouble(netPrice).toDouble(),
             sellingFormat = sellingFormat,
             userId = userId,
             sellingProcessTypeId = sellingType,
@@ -311,7 +299,7 @@ class MainFragment : Fragment() {
     }
 
     private fun updateTotalPrice() {
-        val totalPrice = calculateTotalPrice()
-        binding.mainTotalPrice.text = "Total: ${formatDouble(totalPrice)}"
+        val totalPrice = CalculateUtils.calculateTotalPrice(cartItems)
+        binding.mainTotalPrice.text = "Total: ${CalculateUtils.formatDouble(totalPrice)}"
     }
 }
