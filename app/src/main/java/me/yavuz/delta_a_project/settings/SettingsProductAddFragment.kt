@@ -10,9 +10,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import me.yavuz.delta_a_project.R
 import me.yavuz.delta_a_project.database.DbHelper
 import me.yavuz.delta_a_project.databinding.FragmentSettingsProductAddBinding
@@ -46,7 +44,7 @@ class SettingsProductAddFragment : Fragment() {
     private fun onPageShow(value: Int?) {
         lifecycleScope.launch {
             if (value != null && value != 0) {
-                val product = withContext(Dispatchers.IO) { viewModel.getProductById(value) }
+                val product = viewModel.getProductById(value)
                 product?.let {
                     binding.productName.setText(it.name)
                     binding.grossPrice.setText(it.price.toString())
@@ -131,9 +129,8 @@ class SettingsProductAddFragment : Fragment() {
             return
         }
 
-        val departmentId =
-            withContext(Dispatchers.IO) { viewModel.getDepartmentByName(department)?.id ?: 0 }
-        val taxId = withContext(Dispatchers.IO) { viewModel.getTaxByName(tax)?.id ?: 0 }
+        val departmentId = viewModel.getDepartmentByName(department)?.id ?: 0
+        val taxId = viewModel.getTaxByName(tax)?.id ?: 0
         val product = Product(
             0,
             name,
@@ -178,9 +175,8 @@ class SettingsProductAddFragment : Fragment() {
             return
         }
 
-        val departmentId =
-            withContext(Dispatchers.IO) { viewModel.getDepartmentByName(department)?.id ?: 0 }
-        val taxId = withContext(Dispatchers.IO) { viewModel.getTaxByName(tax)?.id ?: 0 }
+        val departmentId = viewModel.getDepartmentByName(department)?.id ?: 0
+        val taxId = viewModel.getTaxByName(tax)?.id ?: 0
         val newProduct = Product(
             productId,
             name,
@@ -190,7 +186,7 @@ class SettingsProductAddFragment : Fragment() {
             taxId,
             departmentId
         )
-        withContext(Dispatchers.IO) { viewModel.updateProduct(newProduct) }
+        viewModel.updateProduct(newProduct)
         Toast.makeText(
             binding.root.context,
             "Product updated!",

@@ -13,9 +13,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.davidmiguel.numberkeyboard.NumberKeyboardListener
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import me.yavuz.delta_a_project.R
 import me.yavuz.delta_a_project.adapter.CartAdapter
 import me.yavuz.delta_a_project.adapter.MainItemAdapter
@@ -154,18 +152,16 @@ class MainFragment : Fragment() {
         val taxPriceBuilder = StringBuilder()
         val taxPriceMap = mutableMapOf<String, Double>()
 
-        withContext(Dispatchers.IO) {
-            cartAdapter.cartList.forEach {
-                val tax = viewModel.getTaxById(it.first.taxId)
-                val taxPrice = it.first.price - calculateNetPrice(it.first.price, tax!!.value)
+        cartAdapter.cartList.forEach {
+            val tax = viewModel.getTaxById(it.first.taxId)
+            val taxPrice = it.first.price - calculateNetPrice(it.first.price, tax!!.value)
 
-                taxPriceMap[tax.name] = taxPriceMap.getOrDefault(tax.name, 0.0) + taxPrice
-            }
+            taxPriceMap[tax.name] = taxPriceMap.getOrDefault(tax.name, 0.0) + taxPrice
+        }
 
-            taxPriceMap.forEach { (name, price) ->
-                taxInfoBuilder.append("$name %${viewModel.getTaxByName(name)!!.value}\n")
-                taxPriceBuilder.append("${formatDouble(price)}\n")
-            }
+        taxPriceMap.forEach { (name, price) ->
+            taxInfoBuilder.append("$name %${viewModel.getTaxByName(name)!!.value}\n")
+            taxPriceBuilder.append("${formatDouble(price)}\n")
         }
 
         return Pair(taxInfoBuilder.toString(), taxPriceBuilder.toString())
@@ -213,7 +209,7 @@ class MainFragment : Fragment() {
         userId: Int,
         sellingType: Int
     ) {
-        val tax = withContext(Dispatchers.IO) { viewModel.getTaxById(item.first.taxId) }
+        val tax = viewModel.getTaxById(item.first.taxId)
         val netPrice = calculateNetPrice(item.first.price, tax!!.value)
         val sellingProcess = SellingProcess(
             id = 0,

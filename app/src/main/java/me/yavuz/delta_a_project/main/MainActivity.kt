@@ -7,9 +7,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import me.yavuz.delta_a_project.R
 import me.yavuz.delta_a_project.databinding.ActivityMainBinding
 import me.yavuz.delta_a_project.viewmodel.MainViewModel
@@ -76,11 +74,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun setVisibilityForStaff(dataFromLogin: Int) {
         lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                if (viewModel.getUserById(dataFromLogin)?.userTypeName == "Staff") {
-                    val menu = binding.bottomNavigationView.menu
-                    menu.findItem(R.id.settingsFragment).isVisible = false
-                }
+            if (viewModel.getUserById(dataFromLogin)?.userTypeName == "Staff") {
+                val menu = binding.bottomNavigationView.menu
+                menu.findItem(R.id.settingsFragment).isVisible = false
             }
         }
     }
