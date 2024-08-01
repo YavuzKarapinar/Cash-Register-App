@@ -21,6 +21,18 @@ class DepartmentDAO(private val db: SQLiteDatabase) {
         return null
     }
 
+    fun getDepartmentById(id: Int): Department? {
+        val sql = "SELECT id, group_id, name FROM departments WHERE id = ?"
+
+        db.rawQuery(sql, arrayOf(id.toString())).use {
+            if (it.moveToFirst()) {
+                return Department(it.getInt(0), it.getInt(1), it.getString(2))
+            }
+        }
+
+        return null
+    }
+
     fun getDepartments(): List<Department> {
         val departments = mutableListOf<Department>()
         val sql = "SELECT id, group_id, name FROM departments"

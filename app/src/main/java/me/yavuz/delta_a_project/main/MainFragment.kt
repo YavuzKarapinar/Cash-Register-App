@@ -204,6 +204,7 @@ class MainFragment : Fragment() {
             quantity = item.second,
             priceSell = CalculateUtils.formatDouble(netPrice).toDouble(),
             sellingFormat = sellingFormat,
+            zId = viewModel.getLastZNumber(),
             userId = userId,
             sellingProcessTypeId = sellingType,
             productId = item.first.id
