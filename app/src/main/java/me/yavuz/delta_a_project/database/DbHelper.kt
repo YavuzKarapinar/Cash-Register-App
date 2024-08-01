@@ -39,6 +39,10 @@ class DbHelper private constructor(context: Context) :
         db?.execSQL(DatabaseConstants.CREATE_SELLING_PROCESS_TABLE_QUERY)
         db?.execSQL(DatabaseConstants.CREATE_SELLING_PROCESS_TYPE_TABLE_QUERY)
 
+        //report
+        db?.execSQL(DatabaseConstants.CREATE_REPORT_Z_TABLE_QUERY)
+        db?.execSQL(DatabaseConstants.CREATE_REPORT_X_TABLE_QUERY)
+
         //inserting initial values
         initialValues(db)
     }
@@ -57,16 +61,16 @@ class DbHelper private constructor(context: Context) :
         db?.insert("selling_process_type", null, sellingType3)
     }
 
-    override fun onUpgrade(db: SQLiteDatabase?, p1: Int, p2: Int) {
-         db?.execSQL("DROP TABLE IF EXISTS `groups`")
-         db?.execSQL("DROP TABLE IF EXISTS `departments`")
-         db?.execSQL("DROP TABLE IF EXISTS `products`")
-         db?.execSQL("DROP TABLE IF EXISTS `taxes`")
-         db?.execSQL("DROP TABLE IF EXISTS `users`")
-         db?.execSQL("DROP TABLE IF EXISTS `user_type`")
-         db?.execSQL("DROP TABLE IF EXISTS `selling_process`")
-         db?.execSQL("DROP TABLE IF EXISTS `selling_process_type`")
-         onCreate(db)
+    override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
+        when (oldVersion) {
+            1 -> {
+                if (newVersion >= 2) {
+                    db?.execSQL("ALTER TABLE `selling_process` ADD COLUMN z_id INTEGER DEFAULT 1")
+                    db?.execSQL(DatabaseConstants.CREATE_REPORT_Z_TABLE_QUERY)
+                    db?.execSQL(DatabaseConstants.CREATE_REPORT_X_TABLE_QUERY)
+                }
+            }
+        }
     }
 
     override fun onConfigure(db: SQLiteDatabase?) {

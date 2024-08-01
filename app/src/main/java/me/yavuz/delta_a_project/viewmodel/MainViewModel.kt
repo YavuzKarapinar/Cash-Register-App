@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import me.yavuz.delta_a_project.database.repository.DepartmentRepository
 import me.yavuz.delta_a_project.database.repository.GroupRepository
 import me.yavuz.delta_a_project.database.repository.ProductRepository
+import me.yavuz.delta_a_project.database.repository.ReportZRepository
 import me.yavuz.delta_a_project.database.repository.SellingProcessRepository
 import me.yavuz.delta_a_project.database.repository.TaxRepository
 import me.yavuz.delta_a_project.database.repository.UserRepository
@@ -29,6 +30,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val taxRepository = TaxRepository(application)
     private val productRepository = ProductRepository(application)
     private val sellingProcessRepository = SellingProcessRepository(application)
+    private val reportZRepository = ReportZRepository(application)
 
     fun getUserByNameAndPassword(name: String, password: String): LiveData<User?> {
         val userLiveData = MutableLiveData<User?>()
@@ -99,6 +101,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return groupsLiveData
     }
 
+    suspend fun getGroupById(id: Int): Group? {
+        return groupRepository.getGroupById(id)
+    }
+
     fun isGroupExists(name: String): Boolean {
         return groupRepository.isGroupExists(name)
     }
@@ -138,6 +144,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     suspend fun getDepartmentByName(name: String): Department? {
         return departmentRepository.getDepartmentByName(name)
+    }
+
+    suspend fun getDepartmentById(id: Int): Department? {
+        return departmentRepository.getDepartmentById(id)
     }
 
     fun isDepartmentExists(name: String): Boolean {
@@ -260,11 +270,31 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return sellingProcessRepository.getSellingProcessById(id)
     }
 
+    fun getSellingProcessesByZReportId(zId: Int): LiveData<List<SellingProcess>> {
+        val sellingProcessLiveData = MutableLiveData<List<SellingProcess>>()
+        viewModelScope.launch {
+            val sellingProcess = sellingProcessRepository.getSellingProcessesByZReportId(zId)
+            sellingProcessLiveData.postValue(sellingProcess)
+        }
+
+        return sellingProcessLiveData
+    }
+
     suspend fun saveSellingProcess(sellingProcess: SellingProcess): Long {
         return sellingProcessRepository.saveSellingProcess(sellingProcess)
     }
 
     suspend fun getSellingTypeById(id: Int): SellingProcessType? {
         return sellingProcessRepository.getSellingTypeById(id)
+    }
+
+    suspend fun getLastZNumber(): Int {
+        return reportZRepository.getLastZNumber()
+    }
+
+    fun insertReportZ() {
+        viewModelScope.launch {
+            reportZRepository.insertReportZ()
+        }
     }
 }

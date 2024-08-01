@@ -24,6 +24,12 @@ class DepartmentRepository(context: Context) {
         }
     }
 
+    suspend fun getDepartmentById(id: Int): Department? {
+        return withContext(Dispatchers.IO) {
+            departmentDAO.getDepartmentById(id)
+        }
+    }
+
     fun isDepartmentExists(name: String): Boolean {
         return departmentDAO.isDepartmentExists(name)
     }

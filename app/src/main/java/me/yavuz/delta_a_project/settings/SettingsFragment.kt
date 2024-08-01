@@ -23,7 +23,7 @@ class SettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val group = listOf("STAFF", "MASTER DATA")
+        val group = listOf("STAFF", "MASTER DATA", "REPORT")
         val staffChild = listOf("USER ADD", "USER LIST")
         val masterDataChild = listOf(
             "ADD GROUP",
@@ -32,7 +32,12 @@ class SettingsFragment : Fragment() {
             "ADD PRODUCT",
             "LIST PRODUCT"
         )
-        val childMap = hashMapOf(group[0] to staffChild, group[1] to masterDataChild)
+        val reportChild = listOf("REPORT Z")
+        val childMap = hashMapOf(
+            group[0] to staffChild,
+            group[1] to masterDataChild,
+            group[2] to reportChild
+        )
 
         val adapter = SettingsExpandableListAdapter(binding.root.context, group, childMap)
         binding.expandableListView.setAdapter(adapter)
@@ -49,6 +54,7 @@ class SettingsFragment : Fragment() {
                 "ADD TAX" -> SettingsTaxAddFragment()
                 "ADD PRODUCT" -> SettingsProductAddFragment()
                 "LIST PRODUCT" -> SettingsProductListFragment()
+                "REPORT Z" -> SettingsReportZFragment()
                 else -> Fragment()
             }
 
