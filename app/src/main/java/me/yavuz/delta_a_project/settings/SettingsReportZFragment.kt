@@ -60,28 +60,44 @@ class SettingsReportZFragment : Fragment() {
     private fun onPrintClick() {
         lifecycleScope.launch {
             alertBinding = zReportDialogBinding()
+            val userId = sharedViewModel.data.value
             if (binding.singleUser.isChecked) {
                 lifecycleScope.launch {
-                    singleUser()
-
+                    withContext(Dispatchers.Main) {
+                        alertBinding.usersTitle.text = "Single User"
+                        alertBinding.usersListTextView.text = userId.toString()
+                        alertBinding.extraInformationTextView.text =
+                            "Z Report ID: ${viewModel.getLastZNumber()}"
+                    }
+                    showReportZ(userId)
                 }
             } else if (binding.multiUser.isChecked) {
-                alertBinding.usersTitle.text = "Multiple Users"
+                withContext(Dispatchers.Main) {
+                    alertBinding.usersTitle.text = "Multiple Users"
+                    observeUserData()
+                    alertBinding.extraInformationTextView.text =
+                        "Z Report ID: ${viewModel.getLastZNumber()}"
+                }
+                showReportZ()
             }
         }
     }
 
-    private suspend fun singleUser() {
-        withContext(Dispatchers.Main) {
-            alertBinding.usersTitle.text = "Single User"
-            alertBinding.usersListTextView.text = sharedViewModel.data.value.toString()
-            alertBinding.extraInformationTextView.text =
-                "Z Report ID: ${viewModel.getLastZNumber()}"
+    private fun observeUserData() {
+        viewModel.getUsers().observe(viewLifecycleOwner) {
+            alertBinding.usersListTextView.text = it.toString()
         }
+    }
 
+    private suspend fun showReportZ(userId: Int? = null) {
         viewModel.getSellingProcessesByZReportId(viewModel.getLastZNumber())
             .observe(viewLifecycleOwner) { list ->
-                val filteredList = list.filter { it.userId == sharedViewModel.data.value }
+                val filteredList = if (userId != null) {
+                    list.filter { it.userId == userId }
+                } else {
+                    list
+                }
+
                 CoroutineScope(Dispatchers.Main).launch {
                     getTotalSales(filteredList)
                     getPaymentTypes(filteredList)

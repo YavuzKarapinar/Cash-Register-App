@@ -82,6 +82,9 @@ class MainFragment : Fragment() {
 
     private fun processPayment(type: Int) {
         if (cartItems.isNotEmpty()) {
+            binding.cashPaymentButton.isClickable = false
+            binding.cardPaymentButton.isClickable = false
+            binding.otherPaymentButton.isClickable = false
             sharedViewModel.data.observe(viewLifecycleOwner) { userId ->
                 lifecycleScope.launch {
                     showReceipt(type)
@@ -103,7 +106,12 @@ class MainFragment : Fragment() {
             dialog.dismiss()
             clearViews()
         }
-        builder.setOnDismissListener { clearViews() }
+        builder.setOnDismissListener {
+            binding.cashPaymentButton.isClickable = true
+            binding.cardPaymentButton.isClickable = true
+            binding.otherPaymentButton.isClickable = true
+            clearViews()
+        }
         builder.show()
     }
 
@@ -185,7 +193,8 @@ class MainFragment : Fragment() {
     }
 
     private suspend fun processCartItems(userId: Int, sellingType: Int) {
-        cartItems.forEach { item ->
+        val itemsToProcess = cartItems.toList()
+        itemsToProcess.forEach { item ->
             val sellingFormat = if (item.second > 0) "SALE" else "RETURN"
             saveSellingProcess(item, sellingFormat, userId, sellingType)
         }

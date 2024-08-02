@@ -5,4 +5,8 @@ data class User(
     val name: String,
     val password: String,
     val userTypeName: String
-)
+) {
+    override fun toString(): String {
+        return "Id: $id Name: $name Role: $userTypeName"
+    }
+}
