@@ -46,4 +46,10 @@ class ProductRepository(context: Context) {
             productDAO.updateProduct(product)
         }
     }
+
+    suspend fun getProductByProductNumber(productNumber: Int): Product? {
+        return withContext(Dispatchers.IO) {
+            productDAO.getProductByProductNumber(productNumber)
+        }
+    }
 }

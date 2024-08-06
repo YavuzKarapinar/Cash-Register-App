@@ -52,6 +52,26 @@ class ProductDAO(private val db: SQLiteDatabase) {
         return null
     }
 
+    fun getProductByProductNumber(productNumber: Int): Product? {
+        val sql =
+            "SELECT id, name, gross_price, stock, product_number, tax_id, department_id FROM products WHERE product_number = ?"
+        db.rawQuery(sql, arrayOf(productNumber.toString())).use {
+            if (it.moveToFirst()) {
+                return Product(
+                    it.getInt(0),
+                    it.getString(1),
+                    it.getDouble(2),
+                    it.getInt(3),
+                    it.getInt(4),
+                    it.getInt(5),
+                    it.getInt(6)
+                )
+            }
+        }
+
+        return null
+    }
+
     fun isProductExists(name: String): Boolean {
         val sql =
             "SELECT * FROM products WHERE name = ?"

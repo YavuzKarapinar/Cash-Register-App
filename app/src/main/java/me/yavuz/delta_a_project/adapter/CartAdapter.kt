@@ -35,22 +35,22 @@ class CartAdapter(val cartList: MutableList<Pair<Product, Int>>) :
         holder.bind(cartList[position])
     }
 
-    fun updateItem(product: Product) {
+    fun updateItem(product: Product, quantity: Int = 1) {
         val index = cartList.indexOfFirst { it.first.id == product.id }
 
         if (index == -1) {
-            cartList.add(product to 1)
+            cartList.add(product to quantity)
             notifyItemInserted(cartList.size - 1)
             return
         }
         val currentPair = cartList[index]
 
         if (currentPair.second >= 0) {
-            changeCartList(index, currentPair, currentPair.second + 1)
+            changeCartList(index, currentPair, currentPair.second + quantity)
             return
         }
 
-        changeCartList(index, currentPair, currentPair.second - 1)
+        changeCartList(index, currentPair, currentPair.second - quantity)
     }
 
     private fun changeCartList(

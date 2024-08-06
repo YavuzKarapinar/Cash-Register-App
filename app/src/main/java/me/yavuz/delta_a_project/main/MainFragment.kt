@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -13,7 +12,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.davidmiguel.numberkeyboard.NumberKeyboardListener
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.yavuz.delta_a_project.R
 import me.yavuz.delta_a_project.adapter.CartAdapter
 import me.yavuz.delta_a_project.adapter.MainItemAdapter
@@ -23,6 +24,7 @@ import me.yavuz.delta_a_project.databinding.ReceiptDialogBinding
 import me.yavuz.delta_a_project.model.Product
 import me.yavuz.delta_a_project.model.SellingProcess
 import me.yavuz.delta_a_project.utils.CalculateUtils
+import me.yavuz.delta_a_project.utils.InformationUtils
 import me.yavuz.delta_a_project.viewmodel.MainViewModel
 import me.yavuz.delta_a_project.viewmodel.SharedViewModel
 import java.text.DecimalFormat
@@ -32,6 +34,7 @@ import java.util.Date
 class MainFragment : Fragment() {
 
     private val builder: StringBuilder = StringBuilder()
+    private val pluBuilder: StringBuilder = StringBuilder()
     private lateinit var decimalFormat: DecimalFormat
     private lateinit var binding: FragmentMainBinding
     private val mainItemAdapter by lazy { MainItemAdapter { addToCart(it) } }
@@ -61,6 +64,66 @@ class MainFragment : Fragment() {
         setupCartRecycler()
         setupItemRecycler()
         setupPaymentButtons()
+        setupPluButton()
+    }
+
+    private fun setupPluButton() {
+        binding.pluButton.setOnClickListener {
+            lifecycleScope.launch {
+                if (!pluBuilder.contains("X")) {
+                    InformationUtils.showInfo(
+                        requireContext(),
+                        "Correct Usage: Quantity -> X -> Product Number -> Plu"
+                    )
+                    return@launch
+                }
+
+                val split = pluBuilder.toString().split("X")
+
+                if (split[0].isEmpty() || split[1].isEmpty()) {
+                    InformationUtils.showInfo(
+                        requireContext(),
+                        "Correct Usage: Quantity -> X -> Product Number -> Plu"
+                    )
+                    return@launch
+                }
+
+                val quantity = split[0].toInt()
+                val productNumber = split[1].toInt()
+
+                val product =
+                    withContext(Dispatchers.IO) {
+                        viewModel.getProductByProductNumber(
+                            productNumber
+                        )
+                    }
+
+                if (product == null || (quantity <= 0 || quantity >= product.stock)) {
+                    InformationUtils.showInfo(
+                        requireContext(),
+                        "Product is null or Quantity is not suitable"
+                    )
+                    return@launch
+                }
+
+                if (mainItemAdapter.currentList.find { it.id == product.id }!!.stock <= 0) {
+                    InformationUtils.showInfo(
+                        requireContext(),
+                        "Stock is not enough!"
+                    )
+                    return@launch
+                }
+
+                mainItemAdapter.currentList.find { it.id == product.id }!!.stock -= quantity
+                mainItemAdapter.setData(mainItemAdapter.currentList)
+                cartAdapter.updateItem(product, quantity)
+                mainItemAdapter.notifyDataSetChanged()
+                updateTotalPrice()
+                binding.showNumbers.text = "0.00"
+                pluBuilder.clear()
+                builder.clear()
+            }
+        }
     }
 
     private fun setupPaymentButtons() {
@@ -280,13 +343,21 @@ class MainFragment : Fragment() {
             }
 
             override fun onLeftAuxButtonClicked() {
-                Toast.makeText(binding.root.context, "Multiply", Toast.LENGTH_SHORT).show()
-                // TODO: Implement multiply with PLU
+                if (builder.isNotEmpty()) {
+                    pluBuilder.append("X")
+                    builder.clear()
+                    binding.showNumbers.text = "0.00"
+                }
             }
 
             override fun onRightAuxButtonClicked() {
                 if (builder.isNotEmpty()) {
-                    builder.deleteCharAt(builder.length - 1)
+                    if (builder.isNotEmpty()) {
+                        builder.deleteCharAt(builder.length - 1)
+                    }
+                    if (pluBuilder.isNotEmpty()) {
+                        pluBuilder.deleteCharAt(pluBuilder.length - 1)
+                    }
                     updateTextView()
                 }
             }
@@ -295,6 +366,7 @@ class MainFragment : Fragment() {
 
     private fun appendToBuilder(text: String) {
         builder.append(text)
+        pluBuilder.append(text)
         updateTextView()
     }
 

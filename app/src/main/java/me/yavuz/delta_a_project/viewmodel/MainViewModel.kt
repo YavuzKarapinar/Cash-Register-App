@@ -297,4 +297,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             reportZRepository.insertReportZ()
         }
     }
+
+    suspend fun getProductByProductNumber(productNumber: Int): Product? {
+        return productRepository.getProductByProductNumber(productNumber)
+    }
 }
