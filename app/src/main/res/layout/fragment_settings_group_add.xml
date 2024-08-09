@@ -32,10 +32,11 @@
                 android:layout_width="400dp"
                 android:layout_height="48dp"
                 android:layout_gravity="center"
-                android:layout_marginTop="80dp"
+                android:layout_marginTop="65dp"
+                android:autofillHints=""
                 android:background="@drawable/borders"
-                android:hint="Group Name"
-                android:textSize="24sp" />
+                android:hint="Group Add"
+                android:inputType="text" />
 
             <Button
                 android:id="@+id/groupSave"
