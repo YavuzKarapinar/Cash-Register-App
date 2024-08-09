@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.yavuz.delta_a_project.R
 import me.yavuz.delta_a_project.adapter.ReportAdapter
-import me.yavuz.delta_a_project.databinding.FragmentSettingsReportZBinding
+import me.yavuz.delta_a_project.databinding.FragmentSettingsReportXBinding
 import me.yavuz.delta_a_project.databinding.ReportDialogBinding
 import me.yavuz.delta_a_project.model.ReportItem
 import me.yavuz.delta_a_project.model.SellingProcess
@@ -25,9 +25,9 @@ import me.yavuz.delta_a_project.utils.CalculateUtils
 import me.yavuz.delta_a_project.viewmodel.MainViewModel
 import me.yavuz.delta_a_project.viewmodel.SharedViewModel
 
-class SettingsReportZFragment : Fragment() {
+class SettingsReportXFragment : Fragment() {
 
-    private lateinit var binding: FragmentSettingsReportZBinding
+    private lateinit var binding: FragmentSettingsReportXBinding
     private lateinit var alertBinding: ReportDialogBinding
     private lateinit var itemAdapter: ReportAdapter
     private val viewModel by viewModels<MainViewModel>()
@@ -37,7 +37,7 @@ class SettingsReportZFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentSettingsReportZBinding.inflate(inflater, container, false)
+        binding = FragmentSettingsReportXBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
 
@@ -59,27 +59,40 @@ class SettingsReportZFragment : Fragment() {
 
     private fun onPrintClick() {
         lifecycleScope.launch {
-            alertBinding = ReportDialogBinding()
+            alertBinding = xReportDialogBinding()
             val userId = sharedViewModel.data.value
             lifecycleScope.launch {
-                val zId = viewModel.getLastZNumber().takeIf { it > 0 } ?: viewModel.insertReportZ()
+                val zId = viewModel.getLastZNumber()
+                    .takeIf { it > 0 } ?: viewModel.insertReportZ()
+                val xId = viewModel.getLastXNumber()
+                    .takeIf { it > 0 } ?: viewModel.insertReportX(zId)
                 if (binding.singleUser.isChecked) {
-                    withContext(Dispatchers.Main) {
-                        alertBinding.usersTitle.text = "Single User"
-                        alertBinding.usersListTextView.text = userId.toString()
-                        alertBinding.extraInformationTextView.text = "Z Report ID: $zId"
-                    }
-                    showReportZ(userId, zId)
+                    singleUser(userId, xId, zId)
                 } else if (binding.multiUser.isChecked) {
-                    withContext(Dispatchers.Main) {
-                        alertBinding.usersTitle.text = "Multiple Users"
-                        observeUserData()
-                        alertBinding.extraInformationTextView.text = "Z Report ID: $zId"
-                    }
-                    showReportZ(zId = zId)
+                    multipleUser(xId, zId)
                 }
             }
         }
+    }
+
+    private suspend fun singleUser(userId: Int? = null, xId: Int, zId: Int) {
+        withContext(Dispatchers.Main) {
+            alertBinding.usersTitle.text = "Single User"
+            alertBinding.usersListTextView.text = userId.toString()
+            alertBinding.extraInformationTextView.text =
+                "X Report ID: $xId"
+        }
+        showReportX(userId, zId)
+    }
+
+    private suspend fun multipleUser(xId: Int, zId: Int) {
+        withContext(Dispatchers.Main) {
+            alertBinding.usersTitle.text = "Multiple Users"
+            observeUserData()
+            alertBinding.extraInformationTextView.text =
+                "X Report ID: $xId"
+        }
+        showReportX(zId = zId)
     }
 
     private fun observeUserData() {
@@ -88,7 +101,7 @@ class SettingsReportZFragment : Fragment() {
         }
     }
 
-    private suspend fun showReportZ(userId: Int? = null, zId: Int) {
+    private suspend fun showReportX(userId: Int? = null, zId: Int) {
         viewModel.getSellingProcessesByZReportId(zId)
             .observe(viewLifecycleOwner) { list ->
                 val filteredList = if (userId != null) {
@@ -106,13 +119,13 @@ class SettingsReportZFragment : Fragment() {
 
                 if (filteredList.isNotEmpty()) {
                     CoroutineScope(Dispatchers.IO).launch {
-                        viewModel.insertReportZ()
+                        viewModel.insertReportX(zId)
                     }
                 }
             }
     }
 
-    private fun ReportDialogBinding(): ReportDialogBinding {
+    private fun xReportDialogBinding(): ReportDialogBinding {
         val alertBinding = inflateReportDialog()
         val builder = AlertDialog.Builder(requireContext())
         builder.setView(alertBinding.root)
