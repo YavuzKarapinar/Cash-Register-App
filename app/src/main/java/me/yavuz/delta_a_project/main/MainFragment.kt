@@ -208,12 +208,15 @@ class MainFragment : Fragment() {
     ) {
         val tax = viewModel.getTaxById(item.first.taxId)
         val netPrice = CalculateUtils.calculateNetPrice(item.first.price, tax!!.value)
+        val zId = viewModel.getLastZNumber().takeIf { it > 0 } ?: viewModel.insertReportZ()
+        val xId = viewModel.getLastXNumber().takeIf { it > 0 } ?: viewModel.insertReportX(zId)
         val sellingProcess = SellingProcess(
             id = 0,
             quantity = item.second,
             priceSell = CalculateUtils.formatDouble(netPrice).toDouble(),
             sellingFormat = sellingFormat,
-            zId = viewModel.getLastZNumber(),
+            zId = zId,
+            xId = xId,
             userId = userId,
             sellingProcessTypeId = sellingType,
             productId = item.first.id

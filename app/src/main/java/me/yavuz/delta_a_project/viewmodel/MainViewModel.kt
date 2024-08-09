@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 import me.yavuz.delta_a_project.database.repository.DepartmentRepository
 import me.yavuz.delta_a_project.database.repository.GroupRepository
 import me.yavuz.delta_a_project.database.repository.ProductRepository
-import me.yavuz.delta_a_project.database.repository.ReportZRepository
+import me.yavuz.delta_a_project.database.repository.ReportRepository
 import me.yavuz.delta_a_project.database.repository.SellingProcessRepository
 import me.yavuz.delta_a_project.database.repository.TaxRepository
 import me.yavuz.delta_a_project.database.repository.UserRepository
@@ -30,7 +30,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val taxRepository = TaxRepository(application)
     private val productRepository = ProductRepository(application)
     private val sellingProcessRepository = SellingProcessRepository(application)
-    private val reportZRepository = ReportZRepository(application)
+    private val reportRepository = ReportRepository(application)
 
     fun getUserByNameAndPassword(name: String, password: String): LiveData<User?> {
         val userLiveData = MutableLiveData<User?>()
@@ -289,12 +289,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     suspend fun getLastZNumber(): Int {
-        return reportZRepository.getLastZNumber()
+        return reportRepository.getLastZNumber()
     }
 
-    fun insertReportZ() {
-        viewModelScope.launch {
-            reportZRepository.insertReportZ()
-        }
+    suspend fun insertReportZ(): Int {
+        return reportRepository.insertReportZ()
+    }
+
+    suspend fun getLastXNumber(): Int {
+        return reportRepository.getLastXNumber()
+    }
+
+    suspend fun insertReportX(zId: Int): Int {
+        return reportRepository.insertReportX(zId)
     }
 }

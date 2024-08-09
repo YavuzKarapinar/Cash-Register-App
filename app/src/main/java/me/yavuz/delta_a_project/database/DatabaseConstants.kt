@@ -64,10 +64,12 @@ object DatabaseConstants {
                 "user_id INTEGER, " +
                 "selling_format TEXT," +
                 "z_id INTEGER," +
+                "x_id INTEGER," +
                 "FOREIGN KEY (selling_process_type_id) REFERENCES `selling_process_type`(id) ON DELETE RESTRICT, " +
                 "FOREIGN KEY (product_id) REFERENCES `products`(id) ON DELETE RESTRICT, " +
                 "FOREIGN KEY (user_id) REFERENCES `users`(id) ON DELETE RESTRICT," +
-                "FOREIGN KEY (z_id) REFERENCES `report_z`(id) ON DELETE RESTRICT" +
+                "FOREIGN KEY (z_id) REFERENCES `report_z`(id) ON DELETE RESTRICT," +
+                "FOREIGN KEY (x_id) REFERENCES `report_x`(id) ON DELETE RESTRICT" +
                 ")"
 
     const val CREATE_SELLING_PROCESS_TYPE_TABLE_QUERY =
@@ -85,9 +87,8 @@ object DatabaseConstants {
     const val CREATE_REPORT_X_TABLE_QUERY =
         "CREATE TABLE `report_x` (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "x_number INTEGER," +
-                "z_number INTEGER," +
+                "z_id INTEGER," +
                 "timestamp INTEGER," +
-                "FOREIGN KEY (z_number) REFERENCES `report_z`(z_number) ON DELETE RESTRICT" +
+                "FOREIGN KEY (z_id) REFERENCES `report_z`(id) ON DELETE RESTRICT" +
                 ")"
 }
