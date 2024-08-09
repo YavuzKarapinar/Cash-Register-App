@@ -4,6 +4,7 @@
         <item name="colorPrimary">@color/lightPurple</item>
         <item name="colorSecondary">@color/blue</item>
         <item name="colorAccent">@color/cream</item>
+        <item name="android:textCursorDrawable">@drawable/custom_cursor</item>
     </style>
 
     <style name="Theme.DeltaAProject" parent="Base.Theme.DeltaAProject" />

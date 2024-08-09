@@ -4,5 +4,6 @@
         <item name="colorPrimary">@color/lightPurple</item>
         <item name="colorSecondary">@color/cream</item>
         <item name="colorAccent">@color/blue</item>
+        <item name="android:textCursorDrawable">@drawable/custom_cursor</item>
     </style>
 </resources>
