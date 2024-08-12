@@ -129,6 +129,15 @@ class SettingsProductAddFragment : Fragment() {
             return
         }
 
+        if (viewModel.getProductByProductNumber(productNumber.toInt()) != null) {
+            Toast.makeText(
+                binding.root.context,
+                "This product number already exists!",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+
         val departmentId = viewModel.getDepartmentByName(department)?.id ?: 0
         val taxId = viewModel.getTaxByName(tax)?.id ?: 0
         val product = Product(
@@ -170,6 +179,17 @@ class SettingsProductAddFragment : Fragment() {
             Toast.makeText(
                 binding.root.context,
                 "This product already exists!",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+
+        if (oldProduct?.productNumber != productNumber.toInt() &&
+            viewModel.getProductByProductNumber(productNumber.toInt()) != null
+        ) {
+            Toast.makeText(
+                binding.root.context,
+                "This product number already exists!",
                 Toast.LENGTH_SHORT
             ).show()
             return

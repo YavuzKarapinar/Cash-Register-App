@@ -23,7 +23,7 @@ object DatabaseConstants {
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "name TEXT UNIQUE, " +
                 "department_id INTEGER, " +
-                "product_number INTEGER, " +
+                "product_number INTEGER UNIQUE, " +
                 "tax_id INTEGER, " +
                 "gross_price REAL, " +
                 "stock INTEGER, " +

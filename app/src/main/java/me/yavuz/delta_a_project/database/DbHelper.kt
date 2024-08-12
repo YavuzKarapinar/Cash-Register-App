@@ -64,10 +64,12 @@ class DbHelper private constructor(context: Context) :
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
         when (oldVersion) {
             1 -> {
-                if (newVersion >= 2) {
-                    db?.execSQL("ALTER TABLE `selling_process` ADD COLUMN z_id INTEGER DEFAULT 1")
-                    db?.execSQL(DatabaseConstants.CREATE_REPORT_Z_TABLE_QUERY)
-                    db?.execSQL(DatabaseConstants.CREATE_REPORT_X_TABLE_QUERY)
+                when (newVersion) {
+                    2 -> {
+                        db?.execSQL("ALTER TABLE `selling_process` ADD COLUMN z_id INTEGER DEFAULT 1")
+                        db?.execSQL(DatabaseConstants.CREATE_REPORT_Z_TABLE_QUERY)
+                        db?.execSQL(DatabaseConstants.CREATE_REPORT_X_TABLE_QUERY)
+                    }
                 }
             }
         }
