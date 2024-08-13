@@ -10,7 +10,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import com.davidmiguel.numberkeyboard.NumberKeyboardListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -313,6 +315,10 @@ class MainFragment : Fragment() {
         binding.cartRecyclerView.apply {
             adapter = cartAdapter
             layoutManager = LinearLayoutManager(binding.root.context)
+            addItemDecoration(DividerItemDecoration(
+                requireContext(),
+                DividerItemDecoration.VERTICAL
+            ))
         }
     }
 
@@ -320,6 +326,10 @@ class MainFragment : Fragment() {
         binding.itemRecyclerView.apply {
             layoutManager = LinearLayoutManager(binding.root.context)
             adapter = mainItemAdapter
+            addItemDecoration(DividerItemDecoration(
+                requireContext(),
+                DividerItemDecoration.VERTICAL
+            ))
         }
     }
 
