@@ -7,27 +7,60 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".main.MainFragment">
 
-    <com.davidmiguel.numberkeyboard.NumberKeyboard
-        android:id="@+id/numberKeyboard"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/numpadCard"
         android:layout_width="400dp"
-        android:layout_height="350dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="250dp"
-        android:background="@drawable/borders"
-        app:layout_constraintVertical_bias="1.0"
-        app:numberkeyboard_keyPadding="8dp"
-        app:numberkeyboard_keyWidth="120dp"
-        app:numberkeyboard_keyboardType="custom"
-        app:numberkeyboard_leftAuxBtnBackground="@drawable/borders"
-        app:numberkeyboard_leftAuxBtnIcon="@drawable/baseline_1x_mobiledata_24"
-        app:numberkeyboard_numberKeyBackground="@drawable/borders"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="10dp"
+        app:contentPadding="8dp"
         android:padding="8dp"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:numberkeyboard_rightAuxBtnBackground="@drawable/borders"
-        app:numberkeyboard_rightAuxBtnIcon="@drawable/baseline_delete_24" />
+        app:layout_constraintVertical_bias="1.0">
+
+        <LinearLayout
+            android:id="@+id/cardLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:animateLayoutChanges="true"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/expandText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@drawable/borders"
+                android:paddingHorizontal="8dp"
+                android:text="Expand Numpad"
+                android:textColor="@color/black"
+                android:textSize="32sp"
+                android:textStyle="bold"
+                android:visibility="visible" />
+
+            <com.davidmiguel.numberkeyboard.NumberKeyboard
+                android:id="@+id/numberKeyboard"
+                android:layout_width="match_parent"
+                android:layout_height="350dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/borders"
+                android:visibility="gone"
+                app:numberkeyboard_keyPadding="8dp"
+                app:numberkeyboard_keyWidth="120dp"
+                app:numberkeyboard_keyboardType="custom"
+                app:numberkeyboard_leftAuxBtnBackground="@drawable/borders"
+                app:numberkeyboard_leftAuxBtnIcon="@drawable/baseline_1x_mobiledata_24"
+                app:numberkeyboard_numberKeyBackground="@drawable/borders"
+                app:numberkeyboard_rightAuxBtnBackground="@drawable/borders"
+                app:numberkeyboard_rightAuxBtnIcon="@drawable/baseline_delete_24" />
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
 
     <TextView
         android:id="@+id/showNumbers"
@@ -40,7 +73,7 @@
         android:text="0.00"
         android:textAlignment="textEnd"
         android:textSize="32sp"
-        app:layout_constraintBottom_toTopOf="@+id/numberKeyboard"
+        app:layout_constraintBottom_toTopOf="@+id/numpadCard"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -68,7 +101,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         app:cardCornerRadius="8dp"
-        app:layout_constraintEnd_toStartOf="@+id/numberKeyboard"
+        app:layout_constraintEnd_toStartOf="@+id/numpadCard"
         app:layout_constraintStart_toStartOf="parent"
         tools:layout_editor_absoluteY="16dp">
 
@@ -232,7 +265,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/numberKeyboard"
+        app:layout_constraintStart_toEndOf="@+id/numpadCard"
         app:layout_constraintTop_toBottomOf="@+id/infoBar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

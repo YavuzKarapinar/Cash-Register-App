@@ -1,5 +1,6 @@
 package me.yavuz.delta_a_project.main
 
+import android.animation.LayoutTransition
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +13,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView.ItemDecoration
+import androidx.transition.AutoTransition
+import androidx.transition.TransitionManager
 import com.davidmiguel.numberkeyboard.NumberKeyboardListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -63,6 +65,7 @@ class MainFragment : Fragment() {
     private fun setupUI() {
         setupSearchFilter()
         setupButtonClickListeners()
+        expandNumberKeyboard()
         setupCartRecycler()
         setupItemRecycler()
         setupPaymentButtons()
@@ -350,6 +353,7 @@ class MainFragment : Fragment() {
     }
 
     private fun setupButtonClickListeners() {
+        binding.cardLayout.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
         binding.numberKeyboard.setListener(object : NumberKeyboardListener {
             override fun onNumberClicked(number: Int) {
                 appendToBuilder(number.toString())
@@ -396,5 +400,17 @@ class MainFragment : Fragment() {
     private fun updateTotalPrice() {
         val totalPrice = CalculateUtils.calculateTotalPrice(cartItems)
         binding.mainTotalPrice.text = "Total: ${CalculateUtils.formatDouble(totalPrice)}"
+    }
+
+    private fun expandNumberKeyboard() {
+        binding.expandText.setOnClickListener {
+            val numpadVisibility =
+                if (binding.numberKeyboard.visibility == View.GONE) View.VISIBLE else View.GONE
+            TransitionManager.beginDelayedTransition(binding.cardLayout, AutoTransition())
+            TransitionManager.beginDelayedTransition(binding.cardLayout, AutoTransition())
+            binding.numberKeyboard.visibility = numpadVisibility
+            binding.expandText.text =
+                if (numpadVisibility == View.GONE) "Expand Numpad" else "Collapse Numpad"
+        }
     }
 }
