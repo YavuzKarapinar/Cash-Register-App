@@ -18,7 +18,8 @@ class SettingsTaxListAdapter :
     inner class TaxListViewHolder(private val binding: FragmentTaxListItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(tax: Tax) {
-            binding.taxText.text = tax.name
+            binding.taxName.text = tax.name
+            binding.taxValue.text = tax.value.toString()
             binding.taxDelete.setOnClickListener {
                 onActionListener.onDelete(adapterPosition)
             }

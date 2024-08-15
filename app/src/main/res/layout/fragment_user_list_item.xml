@@ -2,32 +2,32 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/borders"
-    android:padding="5dp"
     android:layout_margin="5dp"
-    android:orientation="horizontal">
+    android:background="@drawable/borders"
+    android:orientation="horizontal"
+    android:padding="5dp">
 
     <TextView
         android:id="@+id/userListName"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:gravity="start"
         android:layout_weight="1"
+        android:gravity="start"
         android:padding="5sp"
         android:textSize="32sp" />
 
     <TextView
         android:id="@+id/userListUserType"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:gravity="start"
         android:layout_weight="1"
+        android:gravity="start"
         android:padding="5sp"
         android:textSize="32sp" />
 
     <ImageView
         android:id="@+id/updateImage"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="0.2"
         android:gravity="end"
@@ -36,7 +36,7 @@
 
     <ImageView
         android:id="@+id/deleteImage"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="0.2"
         android:gravity="end"
