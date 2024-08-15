@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/settingsChildTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Child"
-        android:background="@drawable/settings_border"
-        android:textColor="@color/text_color_selector"
-        android:textSize="24sp"
         android:paddingStart="?android:attr/expandableListPreferredChildPaddingLeft"
-        />
+        android:text="Child"
+        android:textColor="@color/text_color_selector"
+        android:textSize="24sp" />
 
 </LinearLayout>
