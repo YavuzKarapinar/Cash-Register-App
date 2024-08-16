@@ -17,6 +17,8 @@ import me.yavuz.delta_a_project.database.repository.UserRepository
 import me.yavuz.delta_a_project.model.Department
 import me.yavuz.delta_a_project.model.Group
 import me.yavuz.delta_a_project.model.Product
+import me.yavuz.delta_a_project.model.ReportX
+import me.yavuz.delta_a_project.model.ReportZ
 import me.yavuz.delta_a_project.model.SellingProcess
 import me.yavuz.delta_a_project.model.SellingProcessType
 import me.yavuz.delta_a_project.model.Tax
@@ -280,6 +282,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return sellingProcessLiveData
     }
 
+    suspend fun getSellingProcessListByXAndZId(xId: Int, zId: Int): LiveData<List<SellingProcess>> {
+        val sellingProcessLiveData = MutableLiveData<List<SellingProcess>>()
+        viewModelScope.launch {
+            val sellingProcess = sellingProcessRepository.getSellingProcessListByXAndZId(xId, zId)
+            sellingProcessLiveData.postValue(sellingProcess)
+        }
+
+        return sellingProcessLiveData
+    }
+
     suspend fun saveSellingProcess(sellingProcess: SellingProcess): Long {
         return sellingProcessRepository.saveSellingProcess(sellingProcess)
     }
@@ -292,12 +304,32 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return reportRepository.getLastZNumber()
     }
 
+    fun getAllReportZ(): LiveData<List<ReportZ>> {
+        val reportZLiveData = MutableLiveData<List<ReportZ>>()
+        viewModelScope.launch {
+            val reportZ = reportRepository.getAllReportZ()
+            reportZLiveData.postValue(reportZ)
+        }
+
+        return reportZLiveData
+    }
+
     suspend fun insertReportZ(): Int {
         return reportRepository.insertReportZ()
     }
 
     suspend fun getLastXNumber(): Int {
         return reportRepository.getLastXNumber()
+    }
+
+    fun getAllReportX(): LiveData<List<ReportX>> {
+        val reportXLiveData = MutableLiveData<List<ReportX>>()
+        viewModelScope.launch {
+            val reportX = reportRepository.getAllReportX()
+            reportXLiveData.postValue(reportX)
+        }
+
+        return reportXLiveData
     }
 
     suspend fun insertReportX(zId: Int): Int {

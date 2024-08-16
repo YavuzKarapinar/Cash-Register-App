@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.CoroutineScope
@@ -17,9 +18,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.yavuz.delta_a_project.R
 import me.yavuz.delta_a_project.adapter.ReportAdapter
+import me.yavuz.delta_a_project.adapter.ReportZListAdapter
 import me.yavuz.delta_a_project.databinding.FragmentSettingsReportZBinding
 import me.yavuz.delta_a_project.databinding.ReportDialogBinding
 import me.yavuz.delta_a_project.model.ReportItem
+import me.yavuz.delta_a_project.model.ReportZ
 import me.yavuz.delta_a_project.model.SellingProcess
 import me.yavuz.delta_a_project.utils.CalculateUtils
 import me.yavuz.delta_a_project.viewmodel.MainViewModel
@@ -30,6 +33,7 @@ class SettingsReportZFragment : Fragment() {
     private lateinit var binding: FragmentSettingsReportZBinding
     private lateinit var alertBinding: ReportDialogBinding
     private lateinit var itemAdapter: ReportAdapter
+    private val reportZListAdapter = ReportZListAdapter()
     private val viewModel by viewModels<MainViewModel>()
     private val sharedViewModel by activityViewModels<SharedViewModel>()
 
@@ -43,9 +47,24 @@ class SettingsReportZFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        observeList()
         binding.printReportButton.setOnClickListener {
             onPrintClick()
+        }
+
+        reportZListAdapter.onItemClick = {
+            onListItemClicked(it)
+        }
+
+        binding.reportListRecyclerView.apply {
+            adapter = reportZListAdapter
+            layoutManager = GridLayoutManager(requireContext(), 2)
+        }
+    }
+
+    private fun observeList() {
+        viewModel.getAllReportZ().observe(viewLifecycleOwner) {
+            reportZListAdapter.setData(it)
         }
     }
 
@@ -57,6 +76,21 @@ class SettingsReportZFragment : Fragment() {
         }
     }
 
+    private fun onListItemClicked(reportZ: ReportZ) {
+        alertBinding = ReportDialogBinding()
+        lifecycleScope.launch {
+            viewModel.getSellingProcessesByZReportId(reportZ.id)
+                .observe(viewLifecycleOwner) {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        getTotalSales(it)
+                        getPaymentTypes(it)
+                        getDepartmentSales(it)
+                        getGroupSales(it)
+                    }
+                }
+        }
+    }
+
     private fun onPrintClick() {
         lifecycleScope.launch {
             alertBinding = ReportDialogBinding()
@@ -64,22 +98,30 @@ class SettingsReportZFragment : Fragment() {
             lifecycleScope.launch {
                 val zId = viewModel.getLastZNumber().takeIf { it > 0 } ?: viewModel.insertReportZ()
                 if (binding.singleUser.isChecked) {
-                    withContext(Dispatchers.Main) {
-                        alertBinding.usersTitle.text = "Single User"
-                        alertBinding.usersListTextView.text = userId.toString()
-                        alertBinding.extraInformationTextView.text = "Z Report ID: $zId"
-                    }
-                    showReportZ(userId, zId)
+                    singleUser(userId, zId)
                 } else if (binding.multiUser.isChecked) {
-                    withContext(Dispatchers.Main) {
-                        alertBinding.usersTitle.text = "Multiple Users"
-                        observeUserData()
-                        alertBinding.extraInformationTextView.text = "Z Report ID: $zId"
-                    }
-                    showReportZ(zId = zId)
+                    multipleUser(zId)
                 }
             }
         }
+    }
+
+    private suspend fun singleUser(userId: Int?, zId: Int) {
+        withContext(Dispatchers.Main) {
+            alertBinding.usersTitle.text = "Single User"
+            alertBinding.usersListTextView.text = userId.toString()
+            alertBinding.extraInformationTextView.text = "Z Report ID: $zId"
+        }
+        showReportZ(userId, zId)
+    }
+
+    private suspend fun multipleUser(zId: Int) {
+        withContext(Dispatchers.Main) {
+            alertBinding.usersTitle.text = "Multiple Users"
+            observeUserData()
+            alertBinding.extraInformationTextView.text = "Z Report ID: $zId"
+        }
+        showReportZ(zId = zId)
     }
 
     private fun observeUserData() {

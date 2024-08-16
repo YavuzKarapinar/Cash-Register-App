@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.CoroutineScope
@@ -17,9 +18,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.yavuz.delta_a_project.R
 import me.yavuz.delta_a_project.adapter.ReportAdapter
+import me.yavuz.delta_a_project.adapter.ReportXListAdapter
 import me.yavuz.delta_a_project.databinding.FragmentSettingsReportXBinding
 import me.yavuz.delta_a_project.databinding.ReportDialogBinding
 import me.yavuz.delta_a_project.model.ReportItem
+import me.yavuz.delta_a_project.model.ReportX
 import me.yavuz.delta_a_project.model.SellingProcess
 import me.yavuz.delta_a_project.utils.CalculateUtils
 import me.yavuz.delta_a_project.viewmodel.MainViewModel
@@ -30,6 +33,7 @@ class SettingsReportXFragment : Fragment() {
     private lateinit var binding: FragmentSettingsReportXBinding
     private lateinit var alertBinding: ReportDialogBinding
     private lateinit var itemAdapter: ReportAdapter
+    private val reportXListAdapter = ReportXListAdapter()
     private val viewModel by viewModels<MainViewModel>()
     private val sharedViewModel by activityViewModels<SharedViewModel>()
 
@@ -43,9 +47,40 @@ class SettingsReportXFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        observeList()
 
         binding.printReportButton.setOnClickListener {
             onPrintClick()
+        }
+
+        reportXListAdapter.onItemClick = {
+            onListItemClicked(it)
+        }
+
+        binding.reportListRecyclerView.apply {
+            adapter = reportXListAdapter
+            layoutManager = GridLayoutManager(requireContext(), 2)
+        }
+    }
+
+    private fun onListItemClicked(reportX: ReportX) {
+        alertBinding = xReportDialogBinding()
+        lifecycleScope.launch {
+            viewModel.getSellingProcessListByXAndZId(reportX.id, reportX.zId)
+                .observe(viewLifecycleOwner) {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        getTotalSales(it)
+                        getPaymentTypes(it)
+                        getDepartmentSales(it)
+                        getGroupSales(it)
+                    }
+                }
+        }
+    }
+
+    private fun observeList() {
+        viewModel.getAllReportX().observe(viewLifecycleOwner) {
+            reportXListAdapter.setData(it)
         }
     }
 
@@ -58,19 +93,17 @@ class SettingsReportXFragment : Fragment() {
     }
 
     private fun onPrintClick() {
+        alertBinding = xReportDialogBinding()
+        val userId = sharedViewModel.data.value
         lifecycleScope.launch {
-            alertBinding = xReportDialogBinding()
-            val userId = sharedViewModel.data.value
-            lifecycleScope.launch {
-                val zId = viewModel.getLastZNumber()
-                    .takeIf { it > 0 } ?: viewModel.insertReportZ()
-                val xId = viewModel.getLastXNumber()
-                    .takeIf { it > 0 } ?: viewModel.insertReportX(zId)
-                if (binding.singleUser.isChecked) {
-                    singleUser(userId, xId, zId)
-                } else if (binding.multiUser.isChecked) {
-                    multipleUser(xId, zId)
-                }
+            val zId = viewModel.getLastZNumber()
+                .takeIf { it > 0 } ?: viewModel.insertReportZ()
+            val xId = viewModel.getLastXNumber()
+                .takeIf { it > 0 } ?: viewModel.insertReportX(zId)
+            if (binding.singleUser.isChecked) {
+                singleUser(userId, xId, zId)
+            } else if (binding.multiUser.isChecked) {
+                multipleUser(xId, zId)
             }
         }
     }

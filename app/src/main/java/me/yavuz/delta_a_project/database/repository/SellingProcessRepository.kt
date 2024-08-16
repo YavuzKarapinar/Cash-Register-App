@@ -24,6 +24,12 @@ class SellingProcessRepository(context: Context) {
         }
     }
 
+    suspend fun getSellingProcessListByXAndZId(xId: Int, zId: Int): List<SellingProcess> {
+        return withContext(Dispatchers.IO) {
+            sellingProcessDAO.getSellingProcessListByXAndZId(xId, zId)
+        }
+    }
+
     suspend fun saveSellingProcess(sellingProcess: SellingProcess): Long {
         return withContext(Dispatchers.IO) {
             sellingProcessDAO.saveSellingProcess(sellingProcess)

@@ -64,6 +64,36 @@ class SellingProcessDAO(private val db: SQLiteDatabase) {
         return list
     }
 
+    fun getSellingProcessListByXAndZId(xId: Int, zId: Int): List<SellingProcess> {
+        val list = mutableListOf<SellingProcess>()
+        val sql =
+            "SELECT id, quantity, price_sell, amount, selling_format, z_id, x_id, user_id, " +
+                    "selling_process_type_id, product_id " +
+                    "FROM selling_process " +
+                    "WHERE x_id <= ? and z_id = ?"
+
+        db.rawQuery(sql, arrayOf(xId.toString(), zId.toString())).use {
+            while (it.moveToNext()) {
+                list.add(
+                    SellingProcess(
+                        it.getInt(0),
+                        it.getInt(1),
+                        it.getDouble(2),
+                        it.getDouble(3),
+                        it.getString(4),
+                        it.getInt(5),
+                        it.getInt(6),
+                        it.getInt(7),
+                        it.getInt(8),
+                        it.getInt(9)
+                    )
+                )
+            }
+        }
+
+        return list
+    }
+
     fun saveSellingProcess(sellingProcess: SellingProcess): Long {
         val values = ContentValues().apply {
             put("quantity", sellingProcess.quantity)

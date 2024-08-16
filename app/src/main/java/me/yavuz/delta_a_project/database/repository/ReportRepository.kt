@@ -5,6 +5,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import me.yavuz.delta_a_project.database.DbHelper
 import me.yavuz.delta_a_project.database.dao.ReportDAO
+import me.yavuz.delta_a_project.model.ReportX
+import me.yavuz.delta_a_project.model.ReportZ
 
 class ReportRepository(context: Context) {
     private val dbHelper = DbHelper.getInstance(context)
@@ -13,6 +15,12 @@ class ReportRepository(context: Context) {
     suspend fun getLastZNumber(): Int {
         return withContext(Dispatchers.IO) {
             reportDAO.getLastZNumber()
+        }
+    }
+
+    suspend fun getAllReportZ(): List<ReportZ> {
+        return withContext(Dispatchers.IO) {
+            reportDAO.getAllReportZ()
         }
     }
 
@@ -25,6 +33,12 @@ class ReportRepository(context: Context) {
     suspend fun getLastXNumber(): Int {
         return withContext(Dispatchers.IO) {
             reportDAO.getLastXNumber()
+        }
+    }
+
+    suspend fun getAllReportX(): List<ReportX> {
+        return withContext(Dispatchers.IO) {
+            reportDAO.getAllReportX()
         }
     }
 
