@@ -9,6 +9,10 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.yavuz.delta_a_project.databinding.FragmentAdminRegisterBinding
 import me.yavuz.delta_a_project.main.MainActivity
 import me.yavuz.delta_a_project.model.User
@@ -34,29 +38,38 @@ class AdminRegisterFragment : Fragment() {
 
     private fun onRegisterButtonClicked() {
         binding.registerAdminButton.setOnClickListener {
-            val name = binding.registerName.text.toString()
-            val password = binding.registerPassword.text.toString()
-            if (isFieldsNotEmpty(name, password)) {
+            lifecycleScope.launch {
+                val name = binding.registerName.text.toString()
+                val password = binding.registerPassword.text.toString()
+                if (isFieldsNotEmpty(name, password)) {
+                    binding.registerAdminButton.isClickable = false
+                    val userExists = withContext(Dispatchers.IO) {
+                        viewModel.isUserExists(name)
+                    }
 
-                if (viewModel.isUserExists(name)) {
+                    if (userExists) {
+                        Toast.makeText(
+                            binding.root.context,
+                            "This user already exists",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        binding.registerAdminButton.isClickable = true
+                        return@launch
+                    }
+
+                    withContext(Dispatchers.IO) {
+                        viewModel.saveUser("Admin", name, password)
+                    }
+                    observeUser(name, password)
+                    superAdminCreated()
+                    rememberMe(name)
+                } else {
                     Toast.makeText(
                         binding.root.context,
-                        "This user already exists",
+                        "Please fill all fields!",
                         Toast.LENGTH_SHORT
                     ).show()
-                    return@setOnClickListener
                 }
-
-                viewModel.saveUser("Admin", name, password)
-                superAdminCreated()
-                rememberMe(name)
-                observeUser(name, password)
-            } else {
-                Toast.makeText(
-                    binding.root.context,
-                    "Please fill all fields!",
-                    Toast.LENGTH_SHORT
-                ).show()
             }
         }
     }
