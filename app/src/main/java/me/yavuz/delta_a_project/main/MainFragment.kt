@@ -35,6 +35,11 @@ import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 
+/**
+ * Showing main menu for ui look for layout and see also
+ *
+ * @see FragmentMainBinding
+ */
 class MainFragment : Fragment() {
 
     private val builder: StringBuilder = StringBuilder()
@@ -55,6 +60,10 @@ class MainFragment : Fragment() {
         return binding.root
     }
 
+    /**
+     * Setting up ui items when ui elements created, observing products for adding to ui and
+     * initializing decimal format type
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         decimalFormat = DecimalFormat("#,###.##")
@@ -62,6 +71,9 @@ class MainFragment : Fragment() {
         observeProduct()
     }
 
+    /**
+     * Setting up ui
+     */
     private fun setupUI() {
         setupSearchFilter()
         setupButtonClickListeners()
@@ -72,6 +84,14 @@ class MainFragment : Fragment() {
         setupPluButton()
     }
 
+    /**
+     * Setting plu button. This plu property is for adding items to cart for more than one.
+     *
+     * If user clicks number for quantity and after that clicks X button and clicks numbers for
+     * product number it will take that much items from database and add to cart
+     *
+     * For example: 11X1 -> that means product number 1 and 11 pieces of that product
+     */
     private fun setupPluButton() {
         binding.pluButton.setOnClickListener {
             lifecycleScope.launch {
@@ -131,6 +151,11 @@ class MainFragment : Fragment() {
         }
     }
 
+    /**
+     * Setting up payment buttons.
+     *
+     * When user clicks cash, card, other or return buttons it will trigger this method
+     */
     private fun setupPaymentButtons() {
         binding.cashPaymentButton.setOnClickListener { processPayment(1) }
         binding.cardPaymentButton.setOnClickListener { processPayment(2) }
@@ -138,6 +163,10 @@ class MainFragment : Fragment() {
         binding.returnButton.setOnClickListener { processReturn() }
     }
 
+    /**
+     * When user clicks return button it will take items from cart and make their quantity as a
+     * negative number and show it on the ui.
+     */
     private fun processReturn() {
         cartItems.forEachIndexed { index, pair ->
             if(pair.second > 0) {
@@ -148,6 +177,15 @@ class MainFragment : Fragment() {
         updateTotalPrice()
     }
 
+    /**
+     * When user clicks payment buttons it will process this method. With this method we will take
+     * user id from shared view model and send it to process cart items method and also show the receipt
+     *
+     * @param type takes type 1. cash, 2. card, 3. other
+     *
+     * @see processCartItems
+     * @see SharedViewModel
+     */
     private fun processPayment(type: Int) {
         if (cartItems.isNotEmpty()) {
             binding.cashPaymentButton.isClickable = false
@@ -162,6 +200,11 @@ class MainFragment : Fragment() {
         }
     }
 
+    /**
+     * Shows receipt on the ui with sale information
+     *
+     * @param type the type that is used for payment 1. cash, 2. card, 3. other
+     */
     private fun showReceipt(type: Int) {
         val builder = AlertDialog.Builder(binding.root.context)
         val alertBinding = inflateReceiptDialog()
@@ -183,6 +226,9 @@ class MainFragment : Fragment() {
         builder.show()
     }
 
+    /**
+     * Setting receipt total prices. This will be showed on the receipt alert dialog.
+     */
     private fun setReceiptTotalPrices(alertBinding: ReceiptDialogBinding, type: Int) {
         lifecycleScope.launch {
             val totalTax = calculateTotalTax()
@@ -212,6 +258,11 @@ class MainFragment : Fragment() {
         }
     }
 
+    /**
+     * Calculates total taxes
+     *
+     * @return total tax
+     */
     private fun calculateTotalTax(): Double {
         var totalTax = 0.0
         cartAdapter.cartList.forEach {
@@ -223,6 +274,9 @@ class MainFragment : Fragment() {
         return totalTax
     }
 
+    /**
+     * Builds tax details for showing on the receipt alert dialog
+     */
     private suspend fun buildTaxDetails(): Pair<String, String> {
         val taxInfoBuilder = StringBuilder()
         val taxPriceBuilder = StringBuilder()
@@ -244,12 +298,20 @@ class MainFragment : Fragment() {
         return Pair(taxInfoBuilder.toString(), taxPriceBuilder.toString())
     }
 
+    /**
+     * Setting receipt date and time with [SimpleDateFormat]
+     */
     private fun setReceiptDateAndTime(alertBinding: ReceiptDialogBinding) {
         val date = Date()
         alertBinding.date.text = SimpleDateFormat.getDateInstance().format(date)
         alertBinding.clock.text = SimpleDateFormat.getTimeInstance().format(date)
     }
 
+    /**
+     * Inflating receipt alert dialog
+     *
+     * @return [ReceiptDialogBinding]
+     */
     private fun inflateReceiptDialog(): ReceiptDialogBinding {
         val customLayout = layoutInflater.inflate(R.layout.receipt_dialog, binding.root, false)
         val alertBinding = ReceiptDialogBinding.bind(customLayout)
@@ -260,6 +322,18 @@ class MainFragment : Fragment() {
         return alertBinding
     }
 
+    /**
+     * Processing cart items by its selling type
+     *
+     * if quantity is negative it will assign return
+     *
+     * if quantity is positive it will assign sale
+     *
+     * @param userId user id
+     * @param sellingType selling type. For more information see also
+     *
+     * @see [me.yavuz.delta_a_project.model.SellingProcessType]
+     */
     private suspend fun processCartItems(userId: Int, sellingType: Int) {
         val itemsToProcess = cartItems.toList()
         itemsToProcess.forEach { item ->
@@ -268,6 +342,17 @@ class MainFragment : Fragment() {
         }
     }
 
+    /**
+     * Saves selling process to database for more information see also
+     *
+     * @param item pair item to be saved
+     * @param sellingFormat selling format to be saved "return" or "sale"
+     * @param userId user id
+     * @param sellingType selling type to ve saved "cash", "card" or "other"s
+     *
+     * @see [SellingProcess]
+     * @see [MainViewModel.saveSellingProcess]
+     */
     private suspend fun saveSellingProcess(
         item: Pair<Product, Int>,
         sellingFormat: String,
@@ -294,6 +379,15 @@ class MainFragment : Fragment() {
         viewModel.saveSellingProcess(sellingProcess)
     }
 
+    /**
+     * Updates product stocks with its pair.
+     *
+     * If pair's second one is negative it will add to the product
+     *
+     * If pair's second one is positive it will remove from the product
+     *
+     * @param item item pair to be be updated.
+     */
     private suspend fun updateProductStock(item: Pair<Product, Int>) {
         val product = viewModel.getProductById(item.first.id)
         product?.let {
@@ -302,6 +396,9 @@ class MainFragment : Fragment() {
         }
     }
 
+    /**
+     * Clears views after selling products
+     */
     private fun clearViews() {
         cartItems.clear()
         cartAdapter.notifyDataSetChanged()
@@ -313,6 +410,9 @@ class MainFragment : Fragment() {
         observeProduct()
     }
 
+    /**
+     * Setting up cart recycler. Adding Vertical Divider to the recycler view
+     */
     private fun setupCartRecycler() {
         cartAdapter = CartAdapter(cartItems)
         binding.cartRecyclerView.apply {
@@ -325,6 +425,9 @@ class MainFragment : Fragment() {
         }
     }
 
+    /**
+     * Setting up item recycler. Adding Vertical Divider to the recycler view
+     */
     private fun setupItemRecycler() {
         binding.itemRecyclerView.apply {
             layoutManager = LinearLayoutManager(binding.root.context)
@@ -336,12 +439,19 @@ class MainFragment : Fragment() {
         }
     }
 
+    /**
+     * Observing products.
+     */
     private fun observeProduct() {
         viewModel.getProducts().observe(viewLifecycleOwner) {
             mainItemAdapter.setData(it)
         }
     }
 
+    /**
+     * Setting up search field. On Query Text Change it will send filtered text to main item adapter.
+     * If there is an item with that name it will show to ui.
+     */
     private fun setupSearchFilter() {
         binding.mainItemSearch.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean = false
@@ -352,6 +462,15 @@ class MainFragment : Fragment() {
         })
     }
 
+    /**
+     * Setting up number pad button click listeners.
+     *
+     * If number clicked it will append to builder.
+     *
+     * If left aux (plu x button) clicked it will append pluBuilder X
+     *
+     * If right aux (delete button) clicked it will delete one character from the builders.
+     */
     private fun setupButtonClickListeners() {
         binding.cardLayout.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
         binding.numberKeyboard.setListener(object : NumberKeyboardListener {
@@ -381,27 +500,48 @@ class MainFragment : Fragment() {
         })
     }
 
+    /**
+     * Append texts to builders.
+     *
+     * @param text text for appending
+     */
     private fun appendToBuilder(text: String) {
         builder.append(text)
         pluBuilder.append(text)
         updateTextView()
     }
 
+    /**
+     * Updates text view when buttons clicked
+     */
     private fun updateTextView() {
         val value = builder.toString().toDoubleOrNull()?.div(100.0) ?: 0.00
         binding.showNumbers.text = decimalFormat.format(value)
     }
 
+    /**
+     * Adds to card when clicked to product.
+     *
+     * @param product product to add
+     */
     private fun addToCart(product: Product) {
         cartAdapter.updateItem(product)
         updateTotalPrice()
     }
 
+    /**
+     * Updating total price text view when items added or removed from cart.
+     */
     private fun updateTotalPrice() {
         val totalPrice = CalculateUtils.calculateTotalPrice(cartItems)
         binding.mainTotalPrice.text = "Total: ${CalculateUtils.formatDouble(totalPrice)}"
     }
 
+    /**
+     * Expands or Collapse number keyboard when clicked to expand text view
+     *
+     *
+     */
     private fun expandNumberKeyboard() {
         binding.expandText.setOnClickListener {
             val numpadVisibility =

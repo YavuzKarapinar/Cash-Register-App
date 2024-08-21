@@ -14,6 +14,9 @@ import me.yavuz.delta_a_project.databinding.ActivityMainBinding
 import me.yavuz.delta_a_project.viewmodel.MainViewModel
 import me.yavuz.delta_a_project.viewmodel.SharedViewModel
 
+/**
+ * For displaying [MainFragment] and [SettingsFragment]
+ */
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
@@ -33,6 +36,9 @@ class MainActivity : AppCompatActivity() {
         setVisibilityForStaff(dataFromLogin)
     }
 
+    /**
+     * Setting up bottom navigation bar, nav host fragment and nav controller.
+     */
     private fun setupBottomNav() {
         navHostFragment =
             supportFragmentManager.findFragmentById(R.id.mainFrame) as NavHostFragment
@@ -41,6 +47,9 @@ class MainActivity : AppCompatActivity() {
         fragmentNavigation()
     }
 
+    /**
+     * Navigating from main activity to main menu fragment, settings fragment and logout from app.
+     */
     private fun fragmentNavigation() {
         binding.bottomNavigationView.setOnItemSelectedListener {
             when (it.itemId) {
@@ -68,12 +77,25 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Getting Data's from login activity.
+     *
+     * If taken user id is not empty it will set shared view model data for
+     * more info look for see also
+     * @see SharedViewModel
+     *
+     * @return saved user id
+     */
     private fun getDataFromLogin(): Int {
         val dataFromLogin = intent.getIntExtra("userId", 0)
         dataFromLogin.takeIf { it != 0 }.let { sharedViewModel.setData(it!!) }
         return dataFromLogin
     }
 
+    /**
+     * Setting visibility for staff if taken user is staff it will not show setting because of the
+     * authority
+     */
     private fun setVisibilityForStaff(dataFromLogin: Int) {
         lifecycleScope.launch {
             if (viewModel.getUserById(dataFromLogin)?.userTypeName == "Staff") {
@@ -83,6 +105,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Adding null for remember me for logout section if user logout it will remove remember me
+     * property
+     */
     private fun rememberMe() {
         val sharedPref = getSharedPreferences("remember_me", Context.MODE_PRIVATE)
         val editor = sharedPref.edit()
