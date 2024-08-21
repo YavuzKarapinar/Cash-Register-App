@@ -34,6 +34,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val sellingProcessRepository = SellingProcessRepository(application)
     private val reportRepository = ReportRepository(application)
 
+    /**
+     * Getting user's live data info by name and password
+     *
+     * @param name name of the user
+     * @param password password of the user
+     *
+     * @return [LiveData] list of nullable [User]
+     */
     fun getUserByNameAndPassword(name: String, password: String): LiveData<User?> {
         val userLiveData = MutableLiveData<User?>()
         viewModelScope.launch {
@@ -44,10 +52,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return userLiveData
     }
 
+    /**
+     * Getting user by user id
+     *
+     * @param id User id
+     *
+     * @return [User] as a nullable value
+     */
     suspend fun getUserById(id: Int): User? {
         return userRepository.getUserById(id)
     }
 
+    /**
+     * Getting all users that in the database as a live data
+     *
+     * @return [LiveData] list of [User]
+     */
     fun getUsers(): LiveData<List<User>> {
         val usersLiveData = MutableLiveData<List<User>>()
         viewModelScope.launch {
@@ -57,6 +77,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return usersLiveData
     }
 
+    /**
+     * Deleting user from database if user does not have any constraint exception
+     *
+     * @param user User instance
+     * @param onSuccess lambda expression when deleting user is successful
+     * @param onError lambda expression when deleting user is throws an error takes exception as a lambda parameter
+     *
+     * @throws SQLiteConstraintException throws exception if user has a foreign key constraint
+     */
     fun deleteUser(user: User, onSuccess: () -> Unit, onError: (Exception) -> Unit) {
         viewModelScope.launch {
             try {
@@ -68,22 +97,46 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /**
+     * Updates user information
+     *
+     * @param user user that will updated.
+     */
     fun updateUser(user: User) {
         viewModelScope.launch {
             userRepository.updateUser(user)
         }
     }
 
+    /**
+     * Saves user based on the [UserType]
+     *
+     * @param userTypeName takes user type name as a string
+     * @param name user name as a string. User name should be **unique**
+     * @param password password as a string. Password should be only integer values after that cast as a string
+     */
     fun saveUser(userTypeName: String, name: String, password: String) {
         viewModelScope.launch {
             userRepository.saveUser(userTypeName, name, password)
         }
     }
 
+    /**
+     * Checks if user already in the database
+     *
+     * @param name user name.
+     *
+     * @return [Boolean] if true user exist if not user is not exist in the database
+     */
     fun isUserExists(name: String): Boolean {
         return userRepository.isUserExists(name)
     }
 
+    /**
+     * Getting all user types as a [LiveData]
+     *
+     * @return [LiveData] list of [UserType]
+     */
     fun getUserTypes(): LiveData<List<UserType>> {
         val userTypesLiveData = MutableLiveData<List<UserType>>()
         viewModelScope.launch {
@@ -93,6 +146,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return userTypesLiveData
     }
 
+    /**
+     * Getting Groups as a [LiveData]
+     *
+     * @return [LiveData] list of [Group]
+     */
     fun getGroups(): LiveData<List<Group>> {
         val groupsLiveData = MutableLiveData<List<Group>>()
         viewModelScope.launch {
@@ -103,26 +161,59 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return groupsLiveData
     }
 
+    /**
+     * Getting group by group id
+     *
+     * @param id group id
+     *
+     * @return [Group] as a nullable
+     */
     suspend fun getGroupById(id: Int): Group? {
         return groupRepository.getGroupById(id)
     }
 
+    /**
+     * Checks if group already in the database
+     *
+     * @param name group name.
+     *
+     * @return [Boolean] if true group exist if not group is not exist in the database
+     */
     fun isGroupExists(name: String): Boolean {
         return groupRepository.isGroupExists(name)
     }
 
+    /**
+     * Saves group based on the group name
+     *
+     * @param name name of the group. Should be **unique**.
+     */
     fun saveGroup(name: String) {
         viewModelScope.launch {
             groupRepository.saveGroup(name)
         }
     }
 
+    /**
+     * Updates group
+     *
+     * @param group instance of [Group]
+     */
     fun updateGroup(group: Group) {
         viewModelScope.launch {
             groupRepository.updateGroup(group)
         }
     }
 
+    /**
+     * Deleting group from database if group does not have any constraint exception
+     *
+     * @param group instance of [Group]
+     * @param onSuccess lambda expression when deleting group is successful
+     * @param onError lambda expression when deleting group is throws an error takes exception as a lambda parameter
+     *
+     * @throws SQLiteConstraintException throws exception if group has a foreign key constraint
+     */
     fun deleteGroup(group: Group, onSuccess: () -> Unit, onError: (Exception) -> Unit) {
         viewModelScope.launch {
             try {
@@ -134,6 +225,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /**
+     * Getting departments as a [LiveData]
+     *
+     * @return [LiveData] list of [Department]
+     */
     fun getDepartments(): LiveData<List<Department>> {
         val departmentsLiveData = MutableLiveData<List<Department>>()
         viewModelScope.launch {
@@ -144,24 +240,60 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return departmentsLiveData
     }
 
+    /**
+     * Getting department by department name
+     *
+     * @param name Department name
+     *
+     * @return [Department] as a nullable value
+     */
     suspend fun getDepartmentByName(name: String): Department? {
         return departmentRepository.getDepartmentByName(name)
     }
 
+    /**
+     * Getting department by department id
+     *
+     * @param id Department id
+     *
+     * @return [Department] as a nullable value
+     */
     suspend fun getDepartmentById(id: Int): Department? {
         return departmentRepository.getDepartmentById(id)
     }
 
+    /**
+     * Checks if department in the database
+     *
+     * @param name Department name
+     *
+     * @return [Boolean] if true department exist if not department is not exist in the database
+     */
     fun isDepartmentExists(name: String): Boolean {
         return departmentRepository.isDepartmentExists(name)
     }
 
+    /**
+     * Saves department based on the [Group] name
+     *
+     * @param group Group name
+     * @param name Department name. Should be **unique**.
+     */
     fun saveDepartment(group: String, name: String) {
         viewModelScope.launch {
             departmentRepository.saveDepartment(group, name)
         }
     }
 
+    /**
+     * Deleting department from database if department does not have any constraint exception
+     *
+     * @param department instance of [Department]
+     * @param onSuccess lambda expression when deleting department is successful
+     * @param onError lambda expression when deleting department throws an error takes exception as a lambda parameter
+     *
+     * @throws SQLiteConstraintException throws exception if department has a foreign key constraint
+     */
     fun deleteDepartment(
         department: Department,
         onSuccess: () -> Unit,
@@ -177,12 +309,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /**
+     * Updates group
+     *
+     * @param department instance of [Department]
+     */
     fun updateDepartment(department: Department) {
         viewModelScope.launch {
             departmentRepository.updateDepartment(department)
         }
     }
 
+    /**
+     * Getting taxes as a [LiveData]
+     *
+     * @return [LiveData] list of [Tax]
+     */
     fun getTaxes(): LiveData<List<Tax>> {
         val taxesLiveData = MutableLiveData<List<Tax>>()
         viewModelScope.launch {
@@ -193,30 +335,71 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return taxesLiveData
     }
 
+    /**
+     * Getting tax by its name
+     *
+     * @param name tax name
+     *
+     * @return [Tax] as a nullable value
+     */
     suspend fun getTaxByName(name: String): Tax? {
         return taxRepository.getTaxByName(name)
     }
 
+    /**
+     * Getting tax by its id
+     *
+     * @param id tax id
+     *
+     * @return [Tax] as a nullable value
+     */
     fun getTaxById(id: Int): Tax? {
         return taxRepository.getTaxById(id)
     }
 
+    /**
+     * Checks if tax in the database
+     *
+     * @param name Tax name
+     *
+     * @return [Boolean] if true tax exist if not tax is not exist in the database
+     */
     fun isTaxExists(name: String): Boolean {
         return taxRepository.isTaxExists(name)
     }
 
+    /**
+     * Saves tax with its name and value
+     *
+     * @param name tax name. Should be **unique**.
+     * @param value tax value. Should be double and must bigger than 0.0 and lower than 100.0
+     */
     fun saveTax(name: String, value: Double) {
         viewModelScope.launch {
             taxRepository.saveTax(name, value)
         }
     }
 
+    /**
+     * Updates tas
+     *
+     * @param tax instance of [Tax]
+     */
     fun updateTax(tax: Tax) {
         viewModelScope.launch {
             taxRepository.updateTax(tax)
         }
     }
 
+    /**
+     * Deleting tax from database if tax does not have any constraint exception
+     *
+     * @param tax instance of [Tax]
+     * @param onSuccess lambda expression when deleting tax is successful
+     * @param onError lambda expression when deleting tax throws an error takes exception as a lambda parameter
+     *
+     * @throws SQLiteConstraintException throws exception if tax has a foreign key constraint
+     */
     fun deleteTax(tax: Tax, onSuccess: () -> Unit, onError: (Exception) -> Unit) {
         viewModelScope.launch {
             try {
@@ -228,6 +411,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /**
+     * Getting products as a [LiveData]
+     *
+     * @return [LiveData] list of [Product]
+     */
     fun getProducts(): LiveData<List<Product>> {
         val productsLiveData = MutableLiveData<List<Product>>()
         viewModelScope.launch {
@@ -237,20 +425,59 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return productsLiveData
     }
 
+    /**
+     * Getting product by its id
+     *
+     * @param id Product id
+     *
+     * @return [Product] as a nullable value
+     */
     suspend fun getProductById(id: Int): Product? {
         return productRepository.getProductById(id)
     }
 
+    /**
+     * Getting [Product] by using its product number
+     *
+     * @param productNumber product number of [Product]
+     *
+     * @return [Product] as a nullable value
+     */
+    suspend fun getProductByProductNumber(productNumber: Int): Product? {
+        return productRepository.getProductByProductNumber(productNumber)
+    }
+
+    /**
+     * Checks if product in the database
+     *
+     * @param name Product name
+     *
+     * @return [Boolean] if true product exist if not product is not exist in the database
+     */
     fun isProductExists(name: String): Boolean {
         return productRepository.isProductExists(name)
     }
 
+    /**
+     * Saves product
+     *
+     * @param product instance of [Product]
+     */
     fun saveProduct(product: Product) {
         viewModelScope.launch {
             productRepository.saveProduct(product)
         }
     }
 
+    /**
+     * Deleting product from database if product does not have any constraint exception
+     *
+     * @param product instance of [Product]
+     * @param onSuccess lambda expression when deleting product is successful
+     * @param onError lambda expression when deleting product throws an error takes exception as a lambda parameter
+     *
+     * @throws SQLiteConstraintException throws exception if product has a foreign key constraint
+     */
     fun deleteProduct(product: Product, onSuccess: () -> Unit, onError: (Exception) -> Unit) {
         viewModelScope.launch {
             try {
@@ -262,16 +489,24 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /**
+     * Updates product
+     *
+     * @param product instance of [Product]
+     */
     fun updateProduct(product: Product) {
         viewModelScope.launch {
             productRepository.updateProduct(product)
         }
     }
 
-    suspend fun getSellingProcessById(id: Int): SellingProcess? {
-        return sellingProcessRepository.getSellingProcessById(id)
-    }
-
+    /**
+     * Getting [LiveData] of [SellingProcess] based on [ReportZ] id
+     *
+     * @param zId [ReportZ] id
+     *
+     * @return [LiveData] list of [SellingProcess]
+     */
     fun getSellingProcessesByZReportId(zId: Int): LiveData<List<SellingProcess>> {
         val sellingProcessLiveData = MutableLiveData<List<SellingProcess>>()
         viewModelScope.launch {
@@ -282,6 +517,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return sellingProcessLiveData
     }
 
+    /**
+     * Getting [LiveData] of [SellingProcess] based on [ReportZ] id and [ReportX] id
+     *
+     * @param xId [ReportX] id
+     * @param zId [ReportZ] id
+     *
+     * @return [LiveData] list of [SellingProcess]
+     */
     suspend fun getSellingProcessListByXAndZId(xId: Int, zId: Int): LiveData<List<SellingProcess>> {
         val sellingProcessLiveData = MutableLiveData<List<SellingProcess>>()
         viewModelScope.launch {
@@ -292,18 +535,43 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return sellingProcessLiveData
     }
 
+    /**
+     * Saves selling process
+     *
+     * @param sellingProcess instance of [SellingProcess]
+     *
+     * @return returns database id as a [Long] value
+     */
     suspend fun saveSellingProcess(sellingProcess: SellingProcess): Long {
         return sellingProcessRepository.saveSellingProcess(sellingProcess)
     }
 
+    /**
+     * Getting [SellingProcessType] by its id
+     *
+     * @param id id of [SellingProcessType]
+     *
+     * @return [SellingProcessType] as a nullable value
+     */
     suspend fun getSellingTypeById(id: Int): SellingProcessType? {
         return sellingProcessRepository.getSellingTypeById(id)
     }
 
+    /**
+     * Getting last [ReportZ] id. Gets Last [ReportZ] id if there is no row in the database it will
+     * add row with id of 1 and that moments timestamp
+     *
+     * @return id of the last [ReportZ]
+     */
     suspend fun getLastZNumber(): Int {
         return reportRepository.getLastZNumber()
     }
 
+    /**
+     * Getting all [ReportZ] as a [LiveData]
+     *
+     * @return [LiveData] list of [ReportZ]
+     */
     fun getAllReportZ(): LiveData<List<ReportZ>> {
         val reportZLiveData = MutableLiveData<List<ReportZ>>()
         viewModelScope.launch {
@@ -314,14 +582,30 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return reportZLiveData
     }
 
+    /**
+     * Inserting new [ReportZ] to the database
+     *
+     * @return id of the inserted [ReportZ]
+     */
     suspend fun insertReportZ(): Int {
         return reportRepository.insertReportZ()
     }
 
+    /**
+     * Getting last [ReportX] id. Gets Last [ReportX] id if there is no row in the database it will
+     * add row with id of 1 and that moments timestamp
+     *
+     * @return id of the last [ReportX]
+     */
     suspend fun getLastXNumber(): Int {
         return reportRepository.getLastXNumber()
     }
 
+    /**
+     * Getting all of the [ReportX] as a [LiveData]
+     *
+     * @return [LiveData] list of [ReportX]
+     */
     fun getAllReportX(): LiveData<List<ReportX>> {
         val reportXLiveData = MutableLiveData<List<ReportX>>()
         viewModelScope.launch {
@@ -332,11 +616,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return reportXLiveData
     }
 
+    /**
+     * Inserting [ReportX] to the database based on the [ReportZ] id
+     *
+     * @param zId [ReportZ] id
+     *
+     * @return inserted [ReportX] id
+     */
     suspend fun insertReportX(zId: Int): Int {
         return reportRepository.insertReportX(zId)
-    }
-
-    suspend fun getProductByProductNumber(productNumber: Int): Product? {
-        return productRepository.getProductByProductNumber(productNumber)
     }
 }
