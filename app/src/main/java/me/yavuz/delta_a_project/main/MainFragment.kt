@@ -47,6 +47,10 @@ class MainFragment : Fragment() {
     private lateinit var cartAdapter: CartAdapter
     private val sharedViewModel by activityViewModels<SharedViewModel>()
 
+    private companion object {
+        const val ZERO_NUMBER = "0.00"
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -80,6 +84,7 @@ class MainFragment : Fragment() {
                         requireContext(),
                         "Correct Usage: Quantity -> X -> Product Number -> Plu"
                     )
+                    pluBuilderClear()
                     return@launch
                 }
 
@@ -90,6 +95,7 @@ class MainFragment : Fragment() {
                         requireContext(),
                         "Correct Usage: Quantity -> X -> Product Number -> Plu"
                     )
+                    pluBuilderClear()
                     return@launch
                 }
 
@@ -108,6 +114,7 @@ class MainFragment : Fragment() {
                         requireContext(),
                         "Product is null or Quantity is not suitable"
                     )
+                    pluBuilderClear()
                     return@launch
                 }
 
@@ -116,6 +123,7 @@ class MainFragment : Fragment() {
                         requireContext(),
                         "Stock is not enough!"
                     )
+                    pluBuilderClear()
                     return@launch
                 }
 
@@ -124,7 +132,7 @@ class MainFragment : Fragment() {
                 cartAdapter.updateItem(product, quantity)
                 mainItemAdapter.notifyDataSetChanged()
                 updateTotalPrice()
-                binding.showNumbers.text = "0.00"
+                binding.showNumbers.text = ZERO_NUMBER
                 pluBuilder.clear()
                 builder.clear()
             }
@@ -306,11 +314,21 @@ class MainFragment : Fragment() {
         cartItems.clear()
         cartAdapter.notifyDataSetChanged()
         binding.apply {
-            mainTotalPrice.text = "Total: 0.00"
-            showNumbers.text = "0.00"
+            val total = "Total: $ZERO_NUMBER"
+            mainTotalPrice.text = total
+            showNumbers.text = ZERO_NUMBER
         }
         builder.clear()
+        pluBuilder.clear()
         observeProduct()
+    }
+
+    private fun pluBuilderClear() {
+        binding.apply {
+            showNumbers.text = ZERO_NUMBER
+        }
+        builder.clear()
+        pluBuilder.clear()
     }
 
     private fun setupCartRecycler() {
@@ -360,10 +378,10 @@ class MainFragment : Fragment() {
             }
 
             override fun onLeftAuxButtonClicked() {
-                if (builder.isNotEmpty()) {
+                if (builder.isNotEmpty() && !pluBuilder.contains("X")) {
                     pluBuilder.append("X")
                     builder.clear()
-                    binding.showNumbers.text = "0.00"
+                    binding.showNumbers.text = ZERO_NUMBER
                 }
             }
 
@@ -399,7 +417,8 @@ class MainFragment : Fragment() {
 
     private fun updateTotalPrice() {
         val totalPrice = CalculateUtils.calculateTotalPrice(cartItems)
-        binding.mainTotalPrice.text = "Total: ${CalculateUtils.formatDouble(totalPrice)}"
+        val total = "Total: ${CalculateUtils.formatDouble(totalPrice)}"
+        binding.mainTotalPrice.text = total
     }
 
     private fun expandNumberKeyboard() {
