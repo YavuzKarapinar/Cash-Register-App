@@ -36,6 +36,17 @@ class AdminRegisterFragment : Fragment() {
         onRegisterButtonClicked()
     }
 
+    /**
+     * When user clicked register button this method will invoke. On this method it will control
+     * name and password edit texts.
+     *
+     * If these fields is empty it will show a toast message saying
+     * "Please fill all the fields".
+     *
+     * If it is not empty then it will check that user is already registered to database if its not
+     * it will insert that user to database. Also it will save this user as a remember me and
+     * super admin will not showcased after that moment.
+     */
     private fun onRegisterButtonClicked() {
         binding.registerAdminButton.setOnClickListener {
             lifecycleScope.launch {
@@ -74,10 +85,25 @@ class AdminRegisterFragment : Fragment() {
         }
     }
 
+    /**
+     * Checks if edit text fields is empty or not.
+     *
+     * @param name name edit text string
+     * @param password password edit text string
+     *
+     * @return if it's not empty true if it's empty false
+     */
     private fun isFieldsNotEmpty(name: String, password: String): Boolean {
         return name.isNotEmpty() && password.isNotEmpty()
     }
 
+    /**
+     * Observes user based on its name and password. If its null it will call [startMainActivity]
+     * method.
+     *
+     * @param name name edit text string
+     * @param password password edit text string
+     */
     private fun observeUser(name: String, password: String) {
         val user = viewModel.getUserByNameAndPassword(name, password)
         user.observe(viewLifecycleOwner) {
@@ -87,6 +113,11 @@ class AdminRegisterFragment : Fragment() {
         }
     }
 
+    /**
+     * Starts main activity and add user id to its intent.
+     *
+     * @param user User for adding its id.
+     */
     private fun startMainActivity(user: User) {
         val intent = Intent(requireContext(), MainActivity::class.java)
         intent.putExtra("userId", user.id)
@@ -94,6 +125,9 @@ class AdminRegisterFragment : Fragment() {
         requireActivity().finish()
     }
 
+    /**
+     * Admin Register Fragment will showed to user if its false. This method makes it true to not showed again.
+     */
     private fun superAdminCreated() {
         val sharedPref = requireActivity().getSharedPreferences("super_admin", Context.MODE_PRIVATE)
         val editor = sharedPref.edit()
@@ -101,6 +135,11 @@ class AdminRegisterFragment : Fragment() {
         editor.apply()
     }
 
+    /**
+     * Remember Me functionality added with this method. If its called it will add name to its shared pref.
+     *
+     * @param name the string to be saved in the shared pref.
+     */
     private fun rememberMe(name: String) {
         val sharedPref = requireActivity().getSharedPreferences("remember_me", Context.MODE_PRIVATE)
         val editor = sharedPref.edit()
