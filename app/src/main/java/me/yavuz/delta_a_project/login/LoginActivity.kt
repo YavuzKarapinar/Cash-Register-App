@@ -8,6 +8,9 @@ import androidx.core.view.WindowInsetsCompat
 import me.yavuz.delta_a_project.R
 import me.yavuz.delta_a_project.databinding.ActivityLoginBinding
 
+/**
+ * Login Activity for displaying [LoginFragment], [SplashFragment] and [AdminRegisterFragment]
+ */
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding

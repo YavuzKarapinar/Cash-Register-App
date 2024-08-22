@@ -25,6 +25,13 @@ class SplashFragment : Fragment() {
         return binding.root
     }
 
+    /**
+     * Handler starts after 1.5 sec and checks if super admin is already created.
+     *
+     * if its created it will navigate to [LoginFragment].
+     *
+     * if its not created it will navigate to [AdminRegisterFragment].
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -38,6 +45,12 @@ class SplashFragment : Fragment() {
 
     }
 
+    /**
+     * Checks if super admin is in the shared pref
+     *
+     * @return if its in the shared pref it will return true
+     * if its not in the shared pref it will return false
+     */
     private fun isSuperAdminCreated(): Boolean {
         val sharedPref = requireActivity().getSharedPreferences("super_admin", Context.MODE_PRIVATE)
         return sharedPref.getBoolean("super_admin", false)

@@ -35,6 +35,13 @@ class LoginFragment : Fragment() {
         }
     }
 
+    /**
+     * Checks if name and password is in the database.
+     *
+     * if its in the database it will start [MainActivity].
+     *
+     * if its not in the database it will say "Username or password is wrong".
+     */
     private fun retrieveUserData() {
         if (!TextUtils.isEmpty(binding.loginName.text) &&
             !TextUtils.isEmpty(binding.loginPassword.text)
@@ -63,6 +70,11 @@ class LoginFragment : Fragment() {
         }
     }
 
+    /**
+     * Retrieves remember me shared pref for checking if there is any saved name.
+     *
+     * If its saved it will set name field with that name.
+     */
     private fun retrieveRememberMe() {
         val sharedPref = requireActivity().getSharedPreferences("remember_me", Context.MODE_PRIVATE)
         sharedPref.getString("remember_me", null)?.let {
@@ -70,6 +82,11 @@ class LoginFragment : Fragment() {
         } ?: binding.loginName.setText("")
     }
 
+    /**
+     * Putting name to remember me shared pref.
+     *
+     * @param name name for saving to shared pref.
+     */
     private fun rememberMe(name: String) {
         val sharedPref = requireActivity().getSharedPreferences("remember_me", Context.MODE_PRIVATE)
         val editor = sharedPref.edit()
