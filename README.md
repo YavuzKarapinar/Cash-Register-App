@@ -1,5 +1,6 @@
 ## ⚠️ UYARI
-Uygulamanın kodları development branch'i üzerinden devam etmektedir.
+- Bu proje staj projesidir.
+- Uygulamanın kodları development branch'i üzerinden devam etmektedir.
 
 # Cash Register Uygulaması
 Bu proje, Android platformu için geliştirilmiş bir Cash Register (Yazar Kasa) uygulamasıdır. Uygulama, kullanıcıların satış işlemlerini yönetmelerine, ürün eklemelerine, fiş görüntülemelerine, rapor görüntülemelerine ve ödeme işlemlerini gerçekleştirmelerine olanak tanır.
